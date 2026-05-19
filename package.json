@@ -10,7 +10,7 @@
   ],
   "author": "yovanoc",
   "scripts": {
-    "prepare": "effect-tsgo patch",
+    "prepare": "effect-tsgo patch && ./scripts/prepare-effect.sh",
     "test": "bun test",
     "lint": "oxlint",
     "lint:fix": "oxlint --fix",
