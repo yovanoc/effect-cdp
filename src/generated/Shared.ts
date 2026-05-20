@@ -11,4 +11,6 @@
  * The section above the anchor is the manual seed; codegen appends below it.
  */
 
+export {}; // placeholder — codegen appends real exports below the anchor
+
 // AUTO-GENERATED ANCHOR — codegen appends below this line
