@@ -1,6 +1,6 @@
 import { Cause, Effect, Exit, Schema } from "effect";
 
-import type { Cdp, CdpError } from "../Cdp.js";
+import type { CdpError, CdpService } from "../Cdp.js";
 import { CdpDecodeError, CdpProtocolError } from "../errors.js";
 import * as Runtime from "../generated/Runtime.js";
 import type { SessionId } from "../types.js";
@@ -15,7 +15,7 @@ const renderRaw = (value: unknown): string => {
 };
 
 export const evaluate = Effect.fnUntraced(function* <A, I>(
-  cdp: Cdp["Service"],
+  cdp: CdpService,
   sessionId: SessionId,
   expression: string,
   schema: Schema.Codec<A, I, never, never>,
@@ -27,13 +27,11 @@ export const evaluate = Effect.fnUntraced(function* <A, I>(
   });
 
   if (response.exceptionDetails !== undefined) {
-    return yield* Effect.fail(
-      new CdpProtocolError({
-        code: -32000,
-        message: response.exceptionDetails.text,
-        method: "Runtime.evaluate",
-      }),
-    );
+    return yield* new CdpProtocolError({
+      code: -32000,
+      message: response.exceptionDetails.text,
+      method: "Runtime.evaluate",
+    });
   }
 
   const decoded = Schema.decodeUnknownExit(schema)(response.result.value);

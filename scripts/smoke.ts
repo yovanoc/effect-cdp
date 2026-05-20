@@ -382,7 +382,7 @@ const runMultiSession = Effect.fnUntraced(function* (targetId: string) {
 
   // Fire console.log on sessionA only.
   yield* cdp.session(sessionA).send(GeneratedRuntime.evaluate, {
-    expression: `console.log(${JSON.stringify(marker)})`,
+    expression: `console.log(${String(marker)})`,
     returnByValue: true,
   });
 
@@ -426,7 +426,7 @@ const runDiscovery = Effect.fnUntraced(function* (host: string) {
     const version = yield* discovery.version();
     if (typeof version.Browser !== "string" || version.Browser.length === 0) {
       return yield* new AssertionError({
-        message: `version.Browser missing or empty, got ${JSON.stringify(version.Browser)}`,
+        message: `version.Browser missing or empty, got ${String(version.Browser)}`,
       });
     }
     if (
@@ -434,7 +434,7 @@ const runDiscovery = Effect.fnUntraced(function* (host: string) {
       version["Protocol-Version"].length === 0
     ) {
       return yield* new AssertionError({
-        message: `version.Protocol-Version missing or empty, got ${JSON.stringify(version["Protocol-Version"])}`,
+        message: `version.Protocol-Version missing or empty, got ${String(version["Protocol-Version"])}`,
       });
     }
     if (
@@ -442,7 +442,7 @@ const runDiscovery = Effect.fnUntraced(function* (host: string) {
       version.webSocketDebuggerUrl.length === 0
     ) {
       return yield* new AssertionError({
-        message: `version.webSocketDebuggerUrl missing or empty, got ${JSON.stringify(version.webSocketDebuggerUrl)}`,
+        message: `version.webSocketDebuggerUrl missing or empty, got ${String(version.webSocketDebuggerUrl)}`,
       });
     }
     yield* Effect.log(
@@ -461,12 +461,12 @@ const runDiscovery = Effect.fnUntraced(function* (host: string) {
     }
     if (typeof first.id !== "string" || first.id.length === 0) {
       return yield* new AssertionError({
-        message: `list()[0].id missing or empty, got ${JSON.stringify(first.id)}`,
+        message: `list()[0].id missing or empty, got ${String(first.id)}`,
       });
     }
     if (typeof first.type !== "string" || first.type.length === 0) {
       return yield* new AssertionError({
-        message: `list()[0].type missing or empty, got ${JSON.stringify(first.type)}`,
+        message: `list()[0].type missing or empty, got ${String(first.type)}`,
       });
     }
     if (
@@ -474,7 +474,7 @@ const runDiscovery = Effect.fnUntraced(function* (host: string) {
       first.webSocketDebuggerUrl.length === 0
     ) {
       return yield* new AssertionError({
-        message: `list()[0].webSocketDebuggerUrl missing or empty, got ${JSON.stringify(first.webSocketDebuggerUrl)}`,
+        message: `list()[0].webSocketDebuggerUrl missing or empty, got ${String(first.webSocketDebuggerUrl)}`,
       });
     }
     yield* Effect.log(
@@ -484,7 +484,7 @@ const runDiscovery = Effect.fnUntraced(function* (host: string) {
     const created = yield* discovery.newTab("about:blank");
     if (typeof created.id !== "string" || created.id.length === 0) {
       return yield* new AssertionError({
-        message: `newTab().id missing or empty, got ${JSON.stringify(created.id)}`,
+        message: `newTab().id missing or empty, got ${String(created.id)}`,
       });
     }
     const newTargetId = TargetId.makeUnsafe(created.id);

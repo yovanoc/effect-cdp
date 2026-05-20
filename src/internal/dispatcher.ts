@@ -89,14 +89,11 @@ export const runDispatcher = Effect.fnUntraced(function* (
   const decodeFailures = yield* Ref.make(0);
 
   const routeFrame = Effect.fnUntraced(function* (raw: string) {
-    const parsed = yield* Effect.try({
-      try: () => JSON.parse(raw) as unknown,
-      catch: (error): string => String(error),
-    }).pipe(
+    const parsed = yield* Schema.decodeUnknownEffect(
+      Schema.UnknownFromJsonString,
+    )(raw).pipe(
       Effect.catch((error) =>
-        logDecodeFailure(decodeFailures, raw, error).pipe(
-          Effect.map(() => undefined),
-        ),
+        logDecodeFailure(decodeFailures, raw, error).pipe(Effect.asVoid),
       ),
     );
 
@@ -162,14 +159,5 @@ export const runDispatcher = Effect.fnUntraced(function* (
     return routeFrame(raw);
   });
 
-  yield* run.pipe(
-    Effect.tap(() => pending.drainAll("SocketClosed")),
-    Effect.catch(() =>
-      pending
-        .drainAll("SocketClosed")
-        .pipe(
-          Effect.flatMap(() => new CdpDisconnected({ reason: "SocketClosed" })),
-        ),
-    ),
-  );
+  yield* run.pipe(Effect.tap(() => pending.drainAll("SocketClosed")));
 });

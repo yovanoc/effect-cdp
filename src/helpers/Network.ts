@@ -1,6 +1,6 @@
 import { Duration, Effect, Schema, Stream } from "effect";
 
-import type { Cdp } from "../Cdp.js";
+import type { CdpService } from "../Cdp.js";
 import { CdpDecodeError, CdpTimeout } from "../errors.js";
 import * as Network from "../generated/Network.js";
 import { CdpRequestId, type SessionId } from "../types.js";
@@ -33,7 +33,7 @@ const matchesUrl = (urlPattern: string | RegExp, url: string): boolean =>
  * Fails with `CdpTimeout` if `opts.timeout` elapses before a match.
  */
 export const waitForResponse = Effect.fnUntraced(function* (
-  cdp: Cdp["Service"],
+  cdp: CdpService,
   sessionId: SessionId,
   urlPattern: string | RegExp,
   opts?: WaitForResponseOptions,

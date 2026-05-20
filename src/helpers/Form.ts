@@ -1,6 +1,6 @@
 import { Effect, Schema } from "effect";
 
-import type { Cdp } from "../Cdp.js";
+import type { CdpService } from "../Cdp.js";
 import { CdpProtocolError } from "../errors.js";
 import * as DOM from "../generated/DOM.js";
 import * as Input from "../generated/Input.js";
@@ -36,7 +36,7 @@ const escapeForTemplate = (value: string): string =>
  * `keyUp` events for each character.
  */
 export const type = Effect.fnUntraced(function* (
-  cdp: Cdp["Service"],
+  cdp: CdpService,
   sessionId: SessionId,
   text: string,
 ) {
@@ -56,7 +56,7 @@ export const type = Effect.fnUntraced(function* (
  * provided string by evaluating an assignment in the page context.
  */
 export const fill = Effect.fnUntraced(function* (
-  cdp: Cdp["Service"],
+  cdp: CdpService,
   sessionId: SessionId,
   nodeId: NodeId,
   value: string,
@@ -83,7 +83,7 @@ export const fill = Effect.fnUntraced(function* (
  * Fails with `CdpProtocolError` if `key` is not in the supported keymap.
  */
 export const press = Effect.fnUntraced(function* (
-  cdp: Cdp["Service"],
+  cdp: CdpService,
   sessionId: SessionId,
   key: string,
 ) {

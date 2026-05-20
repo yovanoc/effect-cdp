@@ -51,7 +51,7 @@ export interface CdpSession {
   readonly events: Stream.Stream<RawCdpEvent>;
 }
 
-interface CdpService {
+export interface CdpService {
   readonly send: <Params, Result>(
     cmd: CdpCommand<Params, Result>,
     params: Params,

@@ -1,6 +1,6 @@
 import { Effect, Fiber, Stream } from "effect";
 
-import type { Cdp, CdpError } from "../Cdp.js";
+import type { CdpError, CdpService } from "../Cdp.js";
 import { CdpProtocolError } from "../errors.js";
 import * as PageDomain from "../generated/Page.js";
 import type { SessionId } from "../types.js";
@@ -10,7 +10,7 @@ export interface GotoOptions {
 }
 
 export const goto = Effect.fnUntraced(function* (
-  cdp: Cdp["Service"],
+  cdp: CdpService,
   sessionId: SessionId,
   url: string,
   opts?: GotoOptions,

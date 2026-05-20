@@ -1,4 +1,4 @@
-import { Deferred, Duration, Effect, Option, Predicate } from "effect";
+import { Deferred, Duration, Effect, Option, Predicate, Schema } from "effect";
 import { Socket } from "effect/unstable/socket";
 
 import {
@@ -15,6 +15,8 @@ type SendError =
   | CdpTimeout
   | CdpProtocolError
   | CdpDecodeError;
+
+const encodeFrame = Schema.encodeUnknownSync(Schema.UnknownFromJsonString);
 
 const timeoutError = (
   method: string,
@@ -68,7 +70,7 @@ export const send = Effect.fnUntraced(function* (
   yield* Effect.scoped(
     Effect.gen(function* () {
       const writer = yield* socket.writer;
-      yield* writer(JSON.stringify(frame));
+      yield* writer(encodeFrame(frame));
     }),
   ).pipe(
     Effect.catch(() => {

@@ -1,6 +1,6 @@
 import { Effect, Schema, Stream } from "effect";
 
-import type { Cdp, CdpError } from "../Cdp.js";
+import type { CdpError, CdpService } from "../Cdp.js";
 import * as Target from "../generated/Target.js";
 import { SessionId } from "../types.js";
 
@@ -9,7 +9,7 @@ export interface AutoAttachOptions {
 }
 
 export const attach = Effect.fnUntraced(function* (
-  cdp: Cdp["Service"],
+  cdp: CdpService,
   targetId: string,
 ) {
   const response = yield* cdp.root.send(Target.attachToTarget, {
@@ -24,7 +24,7 @@ const decodeAttachedToTargetParams = Schema.decodeUnknownOption(
 );
 
 export const autoAttach = Effect.fnUntraced(function* (
-  cdp: Cdp["Service"],
+  cdp: CdpService,
   opts?: AutoAttachOptions,
 ) {
   const waitForDebuggerOnStart = opts?.waitForDebuggerOnStart ?? false;

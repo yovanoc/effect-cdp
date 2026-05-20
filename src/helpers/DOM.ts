@@ -1,6 +1,6 @@
 import { Effect, type Schema } from "effect";
 
-import type { Cdp } from "../Cdp.js";
+import type { CdpService } from "../Cdp.js";
 import { CdpProtocolError } from "../errors.js";
 import * as DOM from "../generated/DOM.js";
 import * as Input from "../generated/Input.js";
@@ -16,7 +16,7 @@ export type NodeId = Schema.Schema.Type<typeof DOM.NodeId>;
  * Fails with `CdpProtocolError` if no element matches.
  */
 export const querySelector = Effect.fnUntraced(function* (
-  cdp: Cdp["Service"],
+  cdp: CdpService,
   sessionId: SessionId,
   selector: string,
   nodeId?: NodeId,
@@ -51,7 +51,7 @@ export const querySelector = Effect.fnUntraced(function* (
  * `mousePressed` followed by a `mouseReleased` event at that point.
  */
 export const click = Effect.fnUntraced(function* (
-  cdp: Cdp["Service"],
+  cdp: CdpService,
   sessionId: SessionId,
   nodeId: NodeId,
 ) {
