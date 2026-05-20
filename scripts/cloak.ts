@@ -1,4 +1,6 @@
 import { Effect, Fiber, Stream } from "effect";
+import { FileSystem } from "@effect/platform/FileSystem";
+import { BunFileSystem } from "@effect/platform-bun";
 import { Cdp, CdpConfig } from "../src/index.js";
 import * as Target from "../src/generated/Target.js";
 import * as PageDomain from "../src/generated/Page.js";
@@ -14,6 +16,7 @@ const config = CdpConfig.make({
 
 const program = Effect.gen(function* () {
   const cdp = yield* Cdp;
+  const fs = yield* FileSystem;
 
   const { targetId } = yield* cdp.root.send(Target.createTarget, {
     url: "about:blank",
@@ -30,14 +33,16 @@ const program = Effect.gen(function* () {
 
   const { data } = yield* session.send(PageDomain.captureScreenshot, {});
 
-  yield* Effect.promise(() =>
-    Bun.write("screenshot.png", Buffer.from(data, "base64")),
-  );
+  const buffer = Buffer.from(data, "base64");
+  yield* fs.writeFile("screenshot.png", buffer);
 
   yield* Fiber.interrupt(eventLogger);
 
   return data;
-}).pipe(Effect.provide(Cdp.layerBun(config)));
+}).pipe(
+  Effect.provide(Cdp.layerBun(config)),
+  Effect.provide(BunFileSystem.layer),
+);
 
 if (import.meta.main) {
   BunRuntime.runMain(program);
