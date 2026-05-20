@@ -8,16 +8,13 @@ Generated from the [devtools-protocol](https://github.com/chromedevtools/devtool
 
 ```bash
 # Bun
-bun add effect-cdp effect
+bun add effect-cdp effect@beta @effect/platform-bun@beta
 
 # Node.js
-npm install effect-cdp effect
-
-# Optional: platform-specific package
-bun add @effect/platform-bun
-# or
-npm install @effect/platform-node
+npm install effect-cdp effect@beta @effect/platform-node@beta
 ```
+
+````
 
 ## Quickstart
 
@@ -49,7 +46,7 @@ const program = Effect.gen(function* () {
 }).pipe(Effect.provide(Cdp.layerBun(config)));
 
 Effect.runPromise(program);
-```
+````
 
 ### Node.js
 
