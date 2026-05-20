@@ -86,3 +86,71 @@ export const waitForResponse = Effect.fnUntraced(function* (
 
   return yield* program;
 });
+
+const decodeRequestParams = Schema.decodeUnknownEffect(
+  Network.requestWillBeSent.params,
+);
+
+/**
+ * Wait for the first `Network.requestWillBeSent` event whose URL matches
+ * `urlPattern`. String patterns match by equality; RegExp patterns by `.test`.
+ *
+ * Enables the `Network` domain on the session and passively observes events.
+ * No requests are intercepted or modified.
+ *
+ * Fails with `CdpTimeout` if `opts.timeout` elapses before a match.
+ */
+export const waitForRequest = Effect.fnUntraced(function* (
+  cdp: CdpService,
+  sessionId: SessionId,
+  urlPattern: string | RegExp,
+  opts?: WaitForResponseOptions,
+) {
+  const session = cdp.session(sessionId);
+
+  yield* session.send(Network.enable, {});
+
+  const program = session.events.pipe(
+    Stream.filter((event) => event.method === Network.requestWillBeSent.method),
+    Stream.mapEffect((event) =>
+      decodeRequestParams(event.params).pipe(
+        Effect.mapError(
+          (error) =>
+            new CdpDecodeError({
+              raw: renderRaw(event.params),
+              parseError: String(error),
+            }),
+        ),
+      ),
+    ),
+    Stream.filter((params) => matchesUrl(urlPattern, params.request.url)),
+    Stream.take(1),
+    Stream.runHead,
+    Effect.flatMap((option) =>
+      option._tag === "Some"
+        ? Effect.succeed(option.value.request)
+        : Effect.die(
+            "Network.waitForRequest: stream ended without a matching request",
+          ),
+    ),
+  );
+
+  if (opts?.timeout !== undefined) {
+    const timeout = opts.timeout;
+    return yield* program.pipe(
+      Effect.timeoutOrElse({
+        duration: timeout,
+        orElse: () =>
+          Effect.fail(
+            new CdpTimeout({
+              method: "Network.waitForRequest",
+              requestId: CdpRequestId.makeUnsafe(0),
+              durationMs: Duration.toMillis(timeout),
+            }),
+          ),
+      }),
+    );
+  }
+
+  return yield* program;
+});
