@@ -44,7 +44,7 @@ const program = Effect.gen(function* () {
 }).pipe(Effect.provide(Cdp.layerBun(config)));
 
 Effect.runPromise(program);
-````
+```
 
 ### Node.js
 

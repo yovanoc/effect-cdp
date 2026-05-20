@@ -46,7 +46,7 @@ const makeWsConstructorLayer = (
           new WsImportFailed({
             reason:
               `Failed to import "ws". Install it: bun add ws. ` +
-              `Original error: ${e}`,
+              `Original error: ${String(e)}`,
           }),
       }).pipe(Effect.orDie);
       const WS = wsModule.default ?? wsModule.WebSocket ?? wsModule;
