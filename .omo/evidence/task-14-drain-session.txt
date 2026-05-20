@@ -1,6 +1,0 @@
-task-14 drainSession QA: PASS
-matching session entries failed: 2
-matching failure: CdpDisconnected/TargetDetached
-other session completion: session-b-ok
-root entry failure after explicit fail: CdpProtocolError
-drainSession only affected matching sessionId entries

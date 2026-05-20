@@ -1,3 +1,0 @@
-shared: [0m[33m0[0m
-A imports: B.Y
-diagnostics: [0m[33m0[0m

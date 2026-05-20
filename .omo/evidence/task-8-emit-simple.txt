@@ -1,3 +1,0 @@
-export const Foo = Schema.Struct({
-  "x": Schema.String
-}).annotate({ identifier: "Test.Foo" });

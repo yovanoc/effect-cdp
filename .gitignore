@@ -2,3 +2,7 @@ node_modules
 .repos/effect
 
 scripts/cloak.ts
+
+.omo/
+.cachebro/
+screenshot.png

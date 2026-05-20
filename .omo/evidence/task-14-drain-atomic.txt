@@ -1,7 +1,0 @@
-task-14 drainAll atomic QA: PASS
-registered entries: 2
-drainAll reason: ScopeFinalized
-first deferred failure: CdpDisconnected/ScopeFinalized
-second deferred failure: CdpDisconnected/ScopeFinalized
-register after close failure: CdpDisconnected/ScopeFinalized
-post-drain complete on old id: no effect

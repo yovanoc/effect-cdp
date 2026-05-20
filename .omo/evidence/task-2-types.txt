@@ -1,2 +1,0 @@
-bun run ts:check
-status: pending
