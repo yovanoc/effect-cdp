@@ -1,16 +1,27 @@
 # effect-cdp
 
-Type-safe [Chrome DevTools Protocol](https://chromedevtools.github.io/devtools-protocol/) client for Effect, built on `@effect/platform` with full streaming and error handling.
+Type-safe [Chrome DevTools Protocol](https://chromedevtools.github.io/devtools-protocol/) client for [Effect](https://effect.website/), built on `@effect/platform` with full streaming and error handling.
+
+Generated from the [devtools-protocol](https://github.com/chromedevtools/devtools-protocol) JSON schemas — 58 domains, typed commands, events, and results.
 
 ## Install
 
 ```bash
-bun add effect @effect/platform-bun @effect/platform-node
+# Bun
+bun add effect-cdp effect
+
+# Node.js
+npm install effect-cdp effect
+
+# Optional: platform-specific package
+bun add @effect/platform-bun
 # or
-npm install effect @effect/platform-bun @effect/platform-node
+npm install @effect/platform-node
 ```
 
 ## Quickstart
+
+### Bun
 
 ```typescript
 import { Effect, Layer, Stream } from "effect";
@@ -38,6 +49,38 @@ const program = Effect.gen(function* () {
 }).pipe(Effect.provide(Cdp.layerBun(config)));
 
 Effect.runPromise(program);
+```
+
+### Node.js
+
+```typescript
+import { Cdp } from "effect-cdp";
+
+const program = Effect.gen(function* () {
+  const cdp = yield* Cdp;
+  // ...
+}).pipe(Effect.provide(Cdp.layerNode(config)));
+```
+
+## Auth Headers (e.g., Cloak, Browserless)
+
+Some CDP proxies require `Authorization` headers on the WebSocket handshake. Install `ws` and use `layerWithAuthHeaders`:
+
+```bash
+bun add ws
+```
+
+```typescript
+import { layerWithAuthHeaders } from "effect-cdp";
+
+const cdpLayer = layerWithAuthHeaders(config, {
+  Authorization: "Bearer <token>",
+});
+
+const program = Effect.gen(function* () {
+  const cdp = yield* Cdp;
+  // ...
+}).pipe(Effect.provide(cdpLayer));
 ```
 
 ## Feature Matrix
