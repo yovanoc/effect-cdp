@@ -1,13 +1,17 @@
 {
   "name": "effect-cdp",
-  "version": "1.0.0",
-  "description": "",
+  "version": "0.0.0",
   "keywords": [
     "cdp",
     "chrome devtools protocol",
     "effect"
   ],
-  "author": "yovanoc",
+  "license": "MIT",
+  "author": "yovanoc <yovano_c@outlook.com>",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yovanoc/effect-cdp.git"
+  },
   "type": "module",
   "scripts": {
     "prepare": "effect-tsgo patch && ./scripts/prepare-effect.sh",
