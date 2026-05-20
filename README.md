@@ -14,8 +14,8 @@ npm install effect @effect/platform-bun @effect/platform-node
 
 ```typescript
 import { Effect, Layer, Stream } from "effect";
-import { Cdp, CdpConfig } from "effect-cdp";
-import * as Page from "effect-cdp/generated/Page.js";
+import { Cdp, CdpConfig, SessionId } from "effect-cdp";
+import * as Target from "effect-cdp/generated/Target.js";
 
 const config = CdpConfig.make({
   webSocketDebuggerUrl: "ws://localhost:9222/devtools/browser/<id>",
@@ -26,12 +26,12 @@ const program = Effect.gen(function* () {
   const cdp = yield* Cdp;
 
   // Send a command
-  const { targetId } = yield* cdp.root.send(Page.createTarget, {
+  const { targetId } = yield* cdp.root.send(Target.createTarget, {
     url: "about:blank",
   });
 
   // Get session and listen to events
-  const session = cdp.session(targetId);
+  const session = cdp.session(SessionId.makeUnsafe(targetId));
   const events = yield* Stream.runCollect(session.events);
 
   return events;
