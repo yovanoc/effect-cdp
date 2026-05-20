@@ -1,0 +1,44 @@
+{
+  "version": {
+    "major": "1",
+    "minor": "3"
+  },
+  "domains": [
+    {
+      "domain": "A",
+      "types": [
+        {
+          "id": "X",
+          "type": "object",
+          "properties": [
+            {
+              "name": "y",
+              "$ref": "B.Y",
+              "optional": true
+            }
+          ]
+        }
+      ],
+      "commands": [],
+      "events": []
+    },
+    {
+      "domain": "B",
+      "types": [
+        {
+          "id": "Y",
+          "type": "object",
+          "properties": [
+            {
+              "name": "x",
+              "$ref": "A.X",
+              "optional": true
+            }
+          ]
+        }
+      ],
+      "commands": [],
+      "events": []
+    }
+  ]
+}

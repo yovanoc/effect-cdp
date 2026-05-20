@@ -1,0 +1,33 @@
+{
+  "version": {
+    "major": "1",
+    "minor": "3"
+  },
+  "domains": [
+    {
+      "domain": "Tree",
+      "types": [
+        {
+          "id": "Node",
+          "type": "object",
+          "properties": [
+            {
+              "name": "id",
+              "type": "string"
+            },
+            {
+              "name": "children",
+              "type": "array",
+              "optional": true,
+              "items": {
+                "$ref": "Node"
+              }
+            }
+          ]
+        }
+      ],
+      "commands": [],
+      "events": []
+    }
+  ]
+}

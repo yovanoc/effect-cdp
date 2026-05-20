@@ -1,0 +1,60 @@
+{
+  "version": {
+    "major": "1",
+    "minor": "3"
+  },
+  "domains": [
+    {
+      "domain": "Simple",
+      "types": [
+        {
+          "id": "Status",
+          "type": "string",
+          "enum": ["ok", "failed"]
+        },
+        {
+          "id": "Payload",
+          "type": "object",
+          "properties": [
+            {
+              "name": "id",
+              "type": "string"
+            },
+            {
+              "name": "status",
+              "$ref": "Status"
+            }
+          ]
+        }
+      ],
+      "commands": [
+        {
+          "name": "getPayload",
+          "parameters": [
+            {
+              "name": "id",
+              "type": "string"
+            }
+          ],
+          "returns": [
+            {
+              "name": "payload",
+              "$ref": "Payload"
+            }
+          ]
+        }
+      ],
+      "events": [
+        {
+          "name": "payloadUpdated",
+          "parameters": [
+            {
+              "name": "payload",
+              "$ref": "Payload"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
