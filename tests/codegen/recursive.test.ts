@@ -1,11 +1,15 @@
-import { describe, expect, it } from "bun:test";
+import { describe, expect, it } from "vitest";
 import { detectRecursive } from "../../scripts/codegen/detectRecursive.js";
 
 describe("detectRecursive", () => {
   it("non-recursive types → empty set", () => {
     const types = [
       { id: "Leaf", type: "string" as const },
-      { id: "Node", type: "object" as const, properties: [{ name: "value", type: "string" as const }] },
+      {
+        id: "Node",
+        type: "object" as const,
+        properties: [{ name: "value", type: "string" as const }],
+      },
     ];
     const result = detectRecursive(types);
     expect(result.size).toBe(0);
@@ -49,7 +53,9 @@ describe("detectRecursive", () => {
       {
         id: "Tree",
         type: "object" as const,
-        properties: [{ name: "children", type: "array" as const, items: { $ref: "Tree" } }],
+        properties: [
+          { name: "children", type: "array" as const, items: { $ref: "Tree" } },
+        ],
       },
     ];
     const result = detectRecursive(types);

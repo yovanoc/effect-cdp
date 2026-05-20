@@ -1,4 +1,4 @@
-import { describe, expect, it } from "bun:test";
+import { describe, expect, it } from "vitest";
 import { emitTypeDef, emitTypeRef } from "../../scripts/codegen/emit/schema.js";
 
 describe("emitTypeRef", () => {
@@ -37,13 +37,15 @@ describe("emitTypeRef", () => {
   });
 
   it("array of strings", () => {
-    expect(emitTypeRef({ type: "array", items: { type: "string" } }, "Page")).toBe(
-      "Schema.Array(Schema.String)",
-    );
+    expect(
+      emitTypeRef({ type: "array", items: { type: "string" } }, "Page"),
+    ).toBe("Schema.Array(Schema.String)");
   });
 
   it("array without items → Schema.Array(Schema.Json)", () => {
-    expect(emitTypeRef({ type: "array" }, "Page")).toBe("Schema.Array(Schema.Json)");
+    expect(emitTypeRef({ type: "array" }, "Page")).toBe(
+      "Schema.Array(Schema.Json)",
+    );
   });
 
   it("$ref same domain", () => {
@@ -51,7 +53,9 @@ describe("emitTypeRef", () => {
   });
 
   it("$ref cross domain", () => {
-    expect(emitTypeRef({ $ref: "Runtime.RemoteObjectId" }, "Page")).toBe("Runtime.RemoteObjectId");
+    expect(emitTypeRef({ $ref: "Runtime.RemoteObjectId" }, "Page")).toBe(
+      "Runtime.RemoteObjectId",
+    );
   });
 
   it("enum inline", () => {
@@ -62,7 +66,9 @@ describe("emitTypeRef", () => {
   });
 
   it("unknown type falls back to Schema.Json", () => {
-    expect(emitTypeRef({ type: "unknown-type" } as any, "Page")).toBe("Schema.Json");
+    expect(emitTypeRef({ type: "unknown-type" } as any, "Page")).toBe(
+      "Schema.Json",
+    );
   });
 });
 
@@ -75,7 +81,14 @@ describe("emitTypeDef", () => {
   });
 
   it("enum typedef", () => {
-    const result = emitTypeDef({ id: "TransitionType", type: "string", enum: ["link", "typed", "auto_bookmark"] } as any, "Page");
+    const result = emitTypeDef(
+      {
+        id: "TransitionType",
+        type: "string",
+        enum: ["link", "typed", "auto_bookmark"],
+      } as any,
+      "Page",
+    );
     expect(result).toContain("export const TransitionType");
     expect(result).toContain("Schema.Literals");
     expect(result).toContain('"link"');
@@ -83,7 +96,11 @@ describe("emitTypeDef", () => {
 
   it("struct typedef", () => {
     const result = emitTypeDef(
-      { id: "Rect", type: "object", properties: [{ name: "x", type: "number" }] } as any,
+      {
+        id: "Rect",
+        type: "object",
+        properties: [{ name: "x", type: "number" }],
+      } as any,
       "Page",
     );
     expect(result).toContain("export const Rect");

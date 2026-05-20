@@ -1,4 +1,4 @@
-import { describe, expect, it } from "bun:test";
+import { describe, expect, it } from "vitest";
 import { emitCommand } from "../../scripts/codegen/emit/command.js";
 import { emitEvent } from "../../scripts/codegen/emit/event.js";
 
@@ -27,13 +27,17 @@ describe("emitCommand", () => {
       returns: [],
     });
     expect(result).toContain("params: Schema.Struct({})");
-    expect(result).toContain("result: Schema.Struct({}).annotate({ identifier: \"Page.enable.result\" })");
+    expect(result).toContain(
+      'result: Schema.Struct({}).annotate({ identifier: "Page.enable.result" })',
+    );
   });
 
   it("undefined params → Schema.Struct({})", () => {
     const result = emitCommand("Page", { name: "enable" });
     expect(result).toContain("params: Schema.Struct({})");
-    expect(result).toContain("result: Schema.Struct({}).annotate({ identifier: \"Page.enable.result\" })");
+    expect(result).toContain(
+      'result: Schema.Struct({}).annotate({ identifier: "Page.enable.result" })',
+    );
   });
 
   it("method is as const literal", () => {
@@ -85,7 +89,10 @@ describe("emitEvent", () => {
   });
 
   it("empty params → Schema.Struct({})", () => {
-    const result = emitEvent("Page", { name: "loadEventFired", parameters: [] });
+    const result = emitEvent("Page", {
+      name: "loadEventFired",
+      parameters: [],
+    });
     expect(result).toContain("params: Schema.Struct({})");
   });
 });

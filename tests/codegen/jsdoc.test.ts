@@ -1,4 +1,4 @@
-import { describe, expect, it } from "bun:test";
+import { describe, expect, it } from "vitest";
 import { emitJSDoc } from "../../scripts/codegen/emit/jsdoc.js";
 
 describe("emitJSDoc", () => {
@@ -23,7 +23,11 @@ describe("emitJSDoc", () => {
   });
 
   it("both deprecated and experimental → single block with both", () => {
-    const result = emitJSDoc({ deprecated: true, experimental: true, description: "gone soon" });
+    const result = emitJSDoc({
+      deprecated: true,
+      experimental: true,
+      description: "gone soon",
+    });
     expect(result).toContain("@deprecated");
     expect(result).toContain("@experimental");
     expect(result).toContain("gone soon");
@@ -32,7 +36,11 @@ describe("emitJSDoc", () => {
   });
 
   it("no @example in any output", () => {
-    const result = emitJSDoc({ deprecated: true, experimental: true, description: "test" });
+    const result = emitJSDoc({
+      deprecated: true,
+      experimental: true,
+      description: "test",
+    });
     expect(result).not.toContain("@example");
   });
 });
