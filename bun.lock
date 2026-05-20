@@ -8,6 +8,7 @@
         "@effect/platform-bun": ">=4.0.0-beta.68 || >=4.0.0",
         "@effect/platform-node": ">=4.0.0-beta.68 || >=4.0.0",
         "effect": ">=4.0.0-beta.68 || >=4.0.0",
+        "ws": "^8.20.1",
       },
       "devDependencies": {
         "@effect/tsgo": "0.7.4",

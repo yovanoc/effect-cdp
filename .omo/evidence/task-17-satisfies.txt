@@ -1,0 +1,25 @@
+Task 17: generated schema ProtocolMapping compile-time check
+
+Implemented:
+- scripts/check-codegen.ts imports generated DOM/Page/Runtime modules with .js extensions.
+- Prototype covers Runtime.evaluate, DOM.querySelector, Page.navigate.
+- Assertions compare Schema.Codec.Encoded<typeof command.params/result> against devtools-protocol ProtocolMapping at compile time.
+- Optional protocol fields are compared structurally to Effect Schema optional encoding.
+- Recursive generated schema cut-points that encode as unknown are treated as opaque during nested structural comparison.
+- Runtime script invokes bun run ts:check; if assertion errors include MISMATCH literals, it prints MISMATCH <method> and exits 1.
+
+Verification:
+- bun scripts/check-codegen.ts
+  -> codegen check OK
+- bun run ts:check
+  -> exit 0; suggestions only, zero TypeScript errors
+- bun run test:unit tests/codegen/command.test.ts tests/codegen/recursive.test.ts
+  -> failed because these tests import bun:test and Vitest cannot resolve bun:test
+- bun test tests/codegen/command.test.ts tests/codegen/recursive.test.ts
+  -> 14 pass, 0 fail
+- bun run oxfmt scripts/check-codegen.ts scripts/codegen/emit/suspend.ts src/internal/dispatcher.ts .omo/evidence/task-17-satisfies.txt
+  -> formatted touched source files
+- bun run fmt:check
+  -> failed on pre-existing repo-wide formatting drift (92 files listed); not applied globally
+- lsp_diagnostics scripts/check-codegen.ts, scripts/codegen/emit/suspend.ts, src/internal/dispatcher.ts
+  -> attempted twice; LSP MCP timed out both times

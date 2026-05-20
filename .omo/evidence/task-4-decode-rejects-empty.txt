@@ -1,0 +1,17 @@
+Exit: {
+  "_id": "Exit",
+  "_tag": "Failure",
+  "cause": {
+    "_id": "Cause",
+    "failures": [
+      {
+        "_tag": "Fail",
+        "error": {
+          "raw": "",
+          "parseError": "SchemaError: Expected CdpVersionInfo, got null",
+          "_tag": "CdpDecodeError"
+        }
+      }
+    ]
+  }
+}

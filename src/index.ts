@@ -14,3 +14,5 @@ export {
   CdpTimeout,
 } from "./errors.js";
 export * from "./types.js";
+export { layerWithAuthHeaders } from "./layers/AuthWebSocket.js";
+export { CdpConnection } from "./CdpConnection.js";
