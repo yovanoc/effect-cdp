@@ -1,10 +1,25 @@
 import { tarjanSCC } from "./scc.js";
-import type { CommandDef, Domain, EventDef, Property, Protocol, TypeDef, TypeRef } from "./types.js";
+import type {
+  CommandDef,
+  Domain,
+  EventDef,
+  Property,
+  Protocol,
+  TypeDef,
+  TypeRef,
+} from "./types.js";
 
 export interface ResolvedProtocol {
   readonly byDomain: ReadonlyMap<string, ResolvedDomain>;
-  readonly sharedExtracted: ReadonlyArray<{ domain: string; type: TypeDef; reason: string }>;
-  readonly diagnostics: ReadonlyArray<{ extracted: ReadonlyArray<TypeDef>; reason: string }>;
+  readonly sharedExtracted: ReadonlyArray<{
+    domain: string;
+    type: TypeDef;
+    reason: string;
+  }>;
+  readonly diagnostics: ReadonlyArray<{
+    extracted: ReadonlyArray<TypeDef>;
+    reason: string;
+  }>;
   readonly domainsInCycle: ReadonlySet<string>;
 }
 
@@ -32,9 +47,11 @@ interface CrossDomainRef {
   readonly sourceNodeId?: string;
 }
 
-const compareText = (left: string, right: string): number => left.localeCompare(right, "en");
+const compareText = (left: string, right: string): number =>
+  left.localeCompare(right, "en");
 
-const typeNodeId = (domain: string, typeId: string): string => `${domain}.${typeId}`;
+const typeNodeId = (domain: string, typeId: string): string =>
+  `${domain}.${typeId}`;
 
 const qualifyRef = (currentDomain: string, ref: string): QualifiedRef => {
   const separator = ref.indexOf(".");
@@ -54,7 +71,10 @@ const qualifyRef = (currentDomain: string, ref: string): QualifiedRef => {
   };
 };
 
-const collectTypeRefRefs = (typeRef: TypeRef | undefined, refs: Array<string>): void => {
+const collectTypeRefRefs = (
+  typeRef: TypeRef | undefined,
+  refs: Array<string>,
+): void => {
   if (typeRef === undefined) {
     return;
   }
@@ -71,7 +91,10 @@ const collectPropertyRefs = (property: Property, refs: Array<string>): void => {
   collectTypeRefRefs(property.items, refs);
 };
 
-const collectPropertiesRefs = (properties: ReadonlyArray<Property> | undefined, refs: Array<string>): void => {
+const collectPropertiesRefs = (
+  properties: ReadonlyArray<Property> | undefined,
+  refs: Array<string>,
+): void => {
   if (properties === undefined) {
     return;
   }
@@ -100,11 +123,16 @@ const collectEventRefs = (event: EventDef): ReadonlyArray<string> => {
   return refs;
 };
 
-const buildTypeIndex = (protocol: Protocol): ReadonlyMap<string, ResolvedType> => {
+const buildTypeIndex = (
+  protocol: Protocol,
+): ReadonlyMap<string, ResolvedType> => {
   const byNode = new Map<string, ResolvedType>();
   for (const domain of protocol.domains) {
     for (const type of domain.types) {
-      byNode.set(typeNodeId(domain.domain, type.id), { domain: domain.domain, type });
+      byNode.set(typeNodeId(domain.domain, type.id), {
+        domain: domain.domain,
+        type,
+      });
     }
   }
   return byNode;
@@ -195,17 +223,27 @@ const buildSharedExtracted = (
   components: ReadonlyArray<ReadonlyArray<string>>,
   typeIndex: ReadonlyMap<string, ResolvedType>,
 ): ReadonlyArray<{ domain: string; type: TypeDef; reason: string }> => {
-  const extracted: Array<{ domain: string; type: TypeDef; reason: string }> = [];
+  const extracted: Array<{ domain: string; type: TypeDef; reason: string }> =
+    [];
   for (const component of components) {
     const reason = componentReason(component);
     for (const nodeId of component) {
       const resolved = typeIndex.get(nodeId);
       if (resolved !== undefined) {
-        extracted.push({ domain: resolved.domain, type: resolved.type, reason });
+        extracted.push({
+          domain: resolved.domain,
+          type: resolved.type,
+          reason,
+        });
       }
     }
   }
-  return extracted.sort((left, right) => compareText(typeNodeId(left.domain, left.type.id), typeNodeId(right.domain, right.type.id)));
+  return extracted.sort((left, right) =>
+    compareText(
+      typeNodeId(left.domain, left.type.id),
+      typeNodeId(right.domain, right.type.id),
+    ),
+  );
 };
 
 const buildDiagnostics = (
@@ -214,12 +252,10 @@ const buildDiagnostics = (
 ): ReadonlyArray<{ extracted: ReadonlyArray<TypeDef>; reason: string }> =>
   components
     .map((component) => ({
-      extracted: [...component]
-        .sort(compareText)
-        .flatMap((nodeId) => {
-          const resolved = typeIndex.get(nodeId);
-          return resolved === undefined ? [] : [resolved.type];
-        }),
+      extracted: [...component].sort(compareText).flatMap((nodeId) => {
+        const resolved = typeIndex.get(nodeId);
+        return resolved === undefined ? [] : [resolved.type];
+      }),
       reason: componentReason(component),
     }))
     .sort((left, right) => compareText(left.reason, right.reason));
@@ -231,7 +267,10 @@ const buildDomainImports = (
 ): ReadonlyArray<{ from: string; name: string }> => {
   const imports = new Map<string, { from: string; name: string }>();
   for (const ref of refs) {
-    if (ref.fromDomain !== domain.domain || extractedNodeIds.has(ref.targetNodeId)) {
+    if (
+      ref.fromDomain !== domain.domain ||
+      extractedNodeIds.has(ref.targetNodeId)
+    ) {
       continue;
     }
     const key = typeNodeId(ref.targetDomain, ref.targetTypeId);
@@ -250,7 +289,9 @@ export function resolveRefs(protocol: Protocol): ResolvedProtocol {
   const graph = buildGraph(crossDomainRefs);
   const components = extractedComponents(nodes, graph);
   const sharedExtracted = buildSharedExtracted(components, typeIndex);
-  const extractedNodeIds = new Set(sharedExtracted.map((entry) => typeNodeId(entry.domain, entry.type.id)));
+  const extractedNodeIds = new Set(
+    sharedExtracted.map((entry) => typeNodeId(entry.domain, entry.type.id)),
+  );
   const byDomain = new Map<string, ResolvedDomain>();
 
   for (const domain of protocol.domains) {
@@ -278,8 +319,11 @@ export function resolveRefs(protocol: Protocol): ResolvedProtocol {
     [...(domainEdgeSets.get(node) ?? [])].sort(compareText);
   const domainsInCycle = new Set<string>();
   for (const component of tarjanSCC(domainNodes, domainEdges)) {
-    const isCycle = component.length > 1 ||
-      (component.length === 1 && component[0] !== undefined && (domainEdgeSets.get(component[0]) ?? new Set()).has(component[0]));
+    const isCycle =
+      component.length > 1 ||
+      (component.length === 1 &&
+        component[0] !== undefined &&
+        (domainEdgeSets.get(component[0]) ?? new Set()).has(component[0]));
     if (isCycle) {
       for (const node of component) {
         domainsInCycle.add(node);

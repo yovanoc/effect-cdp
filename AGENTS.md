@@ -89,6 +89,7 @@ The project uses a custom code generation pipeline:
   - `src/generated/<Domain>.ts` — Per-domain commands, events, and types
 
 Each generated domain exports:
+
 - Command schemas as `CdpCommand<Params, Result>` bundles
 - Event types for streaming
 - Type-safe Schema definitions
@@ -102,6 +103,7 @@ Circular dependencies between domains are resolved via:
 3. **Domain-level**: Cycles resolved at domain boundaries, not individual types
 
 Example:
+
 ```typescript
 // Instead of direct reference causing TDZ error:
 const Node: Schema.Schema<Node> = Schema.Struct({ ... }) // ❌ Circular

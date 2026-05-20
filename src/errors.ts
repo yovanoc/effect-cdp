@@ -1,37 +1,38 @@
-import { Schema } from "effect"
+import { Schema } from "effect";
 
-import { CdpRequestId, SessionId } from "./types.js"
+import { CdpRequestId, SessionId } from "./types.js";
 
-export class CdpDisconnected extends Schema.TaggedErrorClass<CdpDisconnected>("CdpDisconnected")(
+export class CdpDisconnected extends Schema.TaggedErrorClass<CdpDisconnected>(
   "CdpDisconnected",
-  {
-    reason: Schema.Literals(["SocketClosed", "ScopeFinalized", "TargetDetached", "PeerKilled"])
-  }
-) {}
+)("CdpDisconnected", {
+  reason: Schema.Literals([
+    "SocketClosed",
+    "ScopeFinalized",
+    "TargetDetached",
+    "PeerKilled",
+  ]),
+}) {}
 
-export class CdpTimeout extends Schema.TaggedErrorClass<CdpTimeout>("CdpTimeout")(
+export class CdpTimeout extends Schema.TaggedErrorClass<CdpTimeout>(
   "CdpTimeout",
-  {
-    method: Schema.String,
-    requestId: CdpRequestId,
-    durationMs: Schema.Number
-  }
-) {}
+)("CdpTimeout", {
+  method: Schema.String,
+  requestId: CdpRequestId,
+  durationMs: Schema.Number,
+}) {}
 
-export class CdpDecodeError extends Schema.TaggedErrorClass<CdpDecodeError>("CdpDecodeError")(
+export class CdpDecodeError extends Schema.TaggedErrorClass<CdpDecodeError>(
   "CdpDecodeError",
-  {
-    raw: Schema.String,
-    parseError: Schema.String
-  }
-) {}
+)("CdpDecodeError", {
+  raw: Schema.String,
+  parseError: Schema.String,
+}) {}
 
-export class CdpProtocolError extends Schema.TaggedErrorClass<CdpProtocolError>("CdpProtocolError")(
+export class CdpProtocolError extends Schema.TaggedErrorClass<CdpProtocolError>(
   "CdpProtocolError",
-  {
-    code: Schema.Number,
-    message: Schema.String,
-    method: Schema.String,
-    sessionId: Schema.optional(SessionId)
-  }
-) {}
+)("CdpProtocolError", {
+  code: Schema.Number,
+  message: Schema.String,
+  method: Schema.String,
+  sessionId: Schema.optional(SessionId),
+}) {}

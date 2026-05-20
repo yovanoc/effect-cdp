@@ -1,6 +1,13 @@
-import type { CommandDef, Domain, EventDef, Protocol, TypeDef } from "./types.js";
+import type {
+  CommandDef,
+  Domain,
+  EventDef,
+  Protocol,
+  TypeDef,
+} from "./types.js";
 
-const compareText = (left: string, right: string): number => left.localeCompare(right, "en");
+const compareText = (left: string, right: string): number =>
+  left.localeCompare(right, "en");
 
 const sortTypes = (types: Array<TypeDef>): Array<TypeDef> =>
   [...types].sort((left, right) => compareText(left.id, right.id));

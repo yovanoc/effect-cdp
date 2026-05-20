@@ -9,10 +9,6 @@
   ],
   "author": "yovanoc",
   "type": "module",
-  "engines": {
-    "node": ">=26",
-    "bun": ">=1.1"
-  },
   "scripts": {
     "prepare": "effect-tsgo patch && ./scripts/prepare-effect.sh",
     "codegen": "bun scripts/codegen.ts",
@@ -47,5 +43,9 @@
   "lint-staged": {
     "*": "bun run oxfmt --no-error-on-unmatched-pattern",
     "*.{js,jsx,ts,tsx,mjs,cjs}": "bun run lint"
+  },
+  "engines": {
+    "bun": ">=1.1",
+    "node": ">=26"
   }
 }

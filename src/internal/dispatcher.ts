@@ -169,7 +169,7 @@ export const runDispatcher = Effect.fnUntraced(function* (
         .drainAll("SocketClosed")
         .pipe(
           Effect.flatMap(() => new CdpDisconnected({ reason: "SocketClosed" })),
-      ),
+        ),
     ),
   );
 });

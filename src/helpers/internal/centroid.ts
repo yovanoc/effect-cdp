@@ -1,6 +1,6 @@
 export interface Point {
-  readonly x: number
-  readonly y: number
+  readonly x: number;
+  readonly y: number;
 }
 
 /**
@@ -11,9 +11,9 @@ export interface Point {
  */
 export const centroid = (quad: ReadonlyArray<number>): Point => {
   if (quad.length < 8) {
-    return { x: 0, y: 0 }
+    return { x: 0, y: 0 };
   }
-  const x = (quad[0]! + quad[2]! + quad[4]! + quad[6]!) / 4
-  const y = (quad[1]! + quad[3]! + quad[5]! + quad[7]!) / 4
-  return { x, y }
-}
+  const x = (quad[0]! + quad[2]! + quad[4]! + quad[6]!) / 4;
+  const y = (quad[1]! + quad[3]! + quad[5]! + quad[7]!) / 4;
+  return { x, y };
+};

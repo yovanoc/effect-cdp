@@ -1,15 +1,23 @@
 import type { Property, TypeDef, TypeRef } from "./types.js";
 
-const refTarget = (ref: string, typeIds: ReadonlySet<string>): string | undefined => {
+const refTarget = (
+  ref: string,
+  typeIds: ReadonlySet<string>,
+): string | undefined => {
   if (typeIds.has(ref)) {
     return ref;
   }
 
-  const localName = ref.includes(".") ? ref.slice(ref.lastIndexOf(".") + 1) : ref;
+  const localName = ref.includes(".")
+    ? ref.slice(ref.lastIndexOf(".") + 1)
+    : ref;
   return typeIds.has(localName) ? localName : undefined;
 };
 
-const collectTypeRefTargets = (typeRef: TypeRef | undefined, typeIds: ReadonlySet<string>): ReadonlyArray<string> => {
+const collectTypeRefTargets = (
+  typeRef: TypeRef | undefined,
+  typeIds: ReadonlySet<string>,
+): ReadonlyArray<string> => {
   if (typeRef === undefined) {
     return [];
   }
@@ -24,20 +32,32 @@ const collectTypeRefTargets = (typeRef: TypeRef | undefined, typeIds: ReadonlySe
   ];
 };
 
-const collectPropertyTargets = (property: Property, typeIds: ReadonlySet<string>): ReadonlyArray<string> => [
+const collectPropertyTargets = (
+  property: Property,
+  typeIds: ReadonlySet<string>,
+): ReadonlyArray<string> => [
   ...collectTypeRefTargets(property, typeIds),
   ...collectTypeRefTargets(property.items, typeIds),
 ];
 
-const collectTypeTargets = (type: TypeDef, typeIds: ReadonlySet<string>): ReadonlyArray<string> => [
+const collectTypeTargets = (
+  type: TypeDef,
+  typeIds: ReadonlySet<string>,
+): ReadonlyArray<string> => [
   ...collectTypeRefTargets(type.items, typeIds),
-  ...(type.properties ?? []).flatMap((property) => collectPropertyTargets(property, typeIds)),
+  ...(type.properties ?? []).flatMap((property) =>
+    collectPropertyTargets(property, typeIds),
+  ),
 ];
 
-const buildAdjacency = (types: ReadonlyArray<TypeDef>): ReadonlyMap<string, ReadonlySet<string>> => {
+const buildAdjacency = (
+  types: ReadonlyArray<TypeDef>,
+): ReadonlyMap<string, ReadonlySet<string>> => {
   const typeIds = new Set(types.map((type) => type.id));
   return new Map(
-    types.map((type) => [type.id, new Set(collectTypeTargets(type, typeIds))] as const),
+    types.map(
+      (type) => [type.id, new Set(collectTypeTargets(type, typeIds))] as const,
+    ),
   );
 };
 
@@ -50,7 +70,9 @@ const visit = (
   recursive: Set<string>,
 ): void => {
   if (visiting.has(typeId)) {
-    path.slice(path.indexOf(typeId)).forEach((cycleTypeId) => recursive.add(cycleTypeId));
+    path
+      .slice(path.indexOf(typeId))
+      .forEach((cycleTypeId) => recursive.add(cycleTypeId));
     return;
   }
   if (visited.has(typeId)) {
@@ -65,7 +87,9 @@ const visit = (
   visited.add(typeId);
 };
 
-export function detectRecursive(types: ReadonlyArray<TypeDef>): ReadonlySet<string> {
+export function detectRecursive(
+  types: ReadonlyArray<TypeDef>,
+): ReadonlySet<string> {
   const adjacency = buildAdjacency(types);
   const recursive = new Set<string>();
   const visited = new Set<string>();

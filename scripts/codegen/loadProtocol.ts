@@ -1,41 +1,84 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { sortProtocol } from "./sort.js";
-import type { CDPType, CommandDef, Domain, EventDef, Property, Protocol, TypeDef, TypeRef } from "./types.js";
+import type {
+  CDPType,
+  CommandDef,
+  Domain,
+  EventDef,
+  Property,
+  Protocol,
+  TypeDef,
+  TypeRef,
+} from "./types.js";
 
-const protocolDirectory = join(process.cwd(), "node_modules", "devtools-protocol", "json");
+const protocolDirectory = join(
+  process.cwd(),
+  "node_modules",
+  "devtools-protocol",
+  "json",
+);
 
-const cdpTypes = new Set<CDPType>(["string", "integer", "number", "boolean", "array", "object", "any"]);
+const cdpTypes = new Set<CDPType>([
+  "string",
+  "integer",
+  "number",
+  "boolean",
+  "array",
+  "object",
+  "any",
+]);
 
 const isRecord = (value: unknown): value is Readonly<Record<string, unknown>> =>
   typeof value === "object" && value !== null && !Array.isArray(value);
 
-const optionalString = (record: Readonly<Record<string, unknown>>, key: string): string | undefined => {
+const optionalString = (
+  record: Readonly<Record<string, unknown>>,
+  key: string,
+): string | undefined => {
   const value = record[key];
   return typeof value === "string" ? value : undefined;
 };
 
-const optionalBoolean = (record: Readonly<Record<string, unknown>>, key: string): boolean | undefined => {
+const optionalBoolean = (
+  record: Readonly<Record<string, unknown>>,
+  key: string,
+): boolean | undefined => {
   const value = record[key];
   return typeof value === "boolean" ? value : undefined;
 };
 
-const optionalNumber = (record: Readonly<Record<string, unknown>>, key: string): number | undefined => {
+const optionalNumber = (
+  record: Readonly<Record<string, unknown>>,
+  key: string,
+): number | undefined => {
   const value = record[key];
   return typeof value === "number" ? value : undefined;
 };
 
-const optionalStringArray = (record: Readonly<Record<string, unknown>>, key: string): Array<string> | undefined => {
+const optionalStringArray = (
+  record: Readonly<Record<string, unknown>>,
+  key: string,
+): Array<string> | undefined => {
   const value = record[key];
-  return Array.isArray(value) && value.every((item) => typeof item === "string") ? value : undefined;
+  return Array.isArray(value) && value.every((item) => typeof item === "string")
+    ? value
+    : undefined;
 };
 
-const optionalType = (record: Readonly<Record<string, unknown>>): CDPType | undefined => {
+const optionalType = (
+  record: Readonly<Record<string, unknown>>,
+): CDPType | undefined => {
   const value = record["type"];
-  return typeof value === "string" && cdpTypes.has(value as CDPType) ? value as CDPType : undefined;
+  return typeof value === "string" && cdpTypes.has(value as CDPType)
+    ? (value as CDPType)
+    : undefined;
 };
 
-const optionalTypeRef = (record: Readonly<Record<string, unknown>>, key: string): TypeRef | undefined => {
+const optionalTypeRef = (
+  record: Readonly<Record<string, unknown>>,
+  key: string,
+): TypeRef | undefined => {
   const value = record[key];
   return isRecord(value) ? readTypeRef(value) : undefined;
 };
@@ -51,9 +94,14 @@ const readTypeRef = (record: Readonly<Record<string, unknown>>): TypeRef => {
   };
 };
 
-const readProperties = (record: Readonly<Record<string, unknown>>, key: string): Array<Property> | undefined => {
+const readProperties = (
+  record: Readonly<Record<string, unknown>>,
+  key: string,
+): Array<Property> | undefined => {
   const value = record[key];
-  return Array.isArray(value) ? value.filter(isRecord).map(readProperty) : undefined;
+  return Array.isArray(value)
+    ? value.filter(isRecord).map(readProperty)
+    : undefined;
 };
 
 const readProperty = (record: Readonly<Record<string, unknown>>): Property => {
@@ -144,7 +192,11 @@ const readEvent = (record: Readonly<Record<string, unknown>>): EventDef => {
   };
 };
 
-const readArray = <A>(record: Readonly<Record<string, unknown>>, key: string, readItem: (item: Readonly<Record<string, unknown>>) => A): Array<A> => {
+const readArray = <A>(
+  record: Readonly<Record<string, unknown>>,
+  key: string,
+  readItem: (item: Readonly<Record<string, unknown>>) => A,
+): Array<A> => {
   const value = record[key];
   return Array.isArray(value) ? value.filter(isRecord).map(readItem) : [];
 };
@@ -177,10 +229,15 @@ const readProtocolFile = (fileName: string): Protocol => {
   return { domains: readArray(parsed, "domains", readDomain) };
 };
 
-const mergeDomains = (browserDomains: Array<Domain>, jsDomains: Array<Domain>): Array<Domain> => {
+const mergeDomains = (
+  browserDomains: Array<Domain>,
+  jsDomains: Array<Domain>,
+): Array<Domain> => {
   const merged = [...jsDomains];
   for (const browserDomain of browserDomains) {
-    const index = merged.findIndex((domain) => domain.domain === browserDomain.domain);
+    const index = merged.findIndex(
+      (domain) => domain.domain === browserDomain.domain,
+    );
     if (index === -1) {
       merged.push(browserDomain);
     } else {
@@ -193,5 +250,7 @@ const mergeDomains = (browserDomains: Array<Domain>, jsDomains: Array<Domain>): 
 export function loadProtocol(): Protocol {
   const browserProtocol = readProtocolFile("browser_protocol.json");
   const jsProtocol = readProtocolFile("js_protocol.json");
-  return sortProtocol({ domains: mergeDomains(browserProtocol.domains, jsProtocol.domains) });
+  return sortProtocol({
+    domains: mergeDomains(browserProtocol.domains, jsProtocol.domains),
+  });
 }
