@@ -9,7 +9,7 @@
  * 1) register socket close first   -> runs last
  * 2) register pending drain second -> runs first
  */
-import { Context, Effect, Layer } from "effect";
+import { Context, Duration, Effect, Layer, Scope } from "effect";
 import { Socket } from "effect/unstable/socket";
 
 import { CdpConfig } from "./CdpConfig.js";
@@ -19,17 +19,18 @@ import { EventBus } from "./internal/eventBus.js";
 import { PendingMap } from "./internal/pending.js";
 import { makeSocketBridge } from "./internal/socketBridge.js";
 
-export class CdpConnection extends Context.Service<
-  CdpConnection,
-  {
-    readonly socket: Socket.Socket;
-    readonly eventBus: EventBus["Service"];
-    readonly pending: PendingMap["Service"];
-    readonly sessionRegistry: SessionRegistry["Service"];
-  }
->()("CdpConnection", {
-  make: Effect.fnUntraced(function* (config: typeof CdpConfig.Type) {
-    const socket = yield* Socket.makeWebSocket(config.webSocketDebuggerUrl);
+interface CdpConnectionShape {
+  readonly socket: Socket.Socket;
+  readonly eventBus: EventBus["Service"];
+  readonly pending: PendingMap["Service"];
+  readonly sessionRegistry: SessionRegistry["Service"];
+}
+
+const buildConnection = (
+  socket: Socket.Socket,
+  config: typeof CdpConfig.Type,
+): Effect.Effect<CdpConnectionShape, never, Scope.Scope> =>
+  Effect.gen(function* () {
     const bridge = yield* makeSocketBridge(socket);
     const eventBus = yield* EventBus.make(config.eventBufferSize);
     const pending = yield* PendingMap.make;
@@ -51,8 +52,28 @@ export class CdpConnection extends Context.Service<
       pending,
       sessionRegistry,
     };
+  });
+
+export class CdpConnection extends Context.Service<
+  CdpConnection,
+  CdpConnectionShape
+>()("CdpConnection", {
+  make: Effect.fnUntraced(function* (config: typeof CdpConfig.Type) {
+    const socket = yield* Socket.makeWebSocket(config.webSocketDebuggerUrl, {
+      openTimeout: Duration.seconds(30),
+    });
+    return yield* buildConnection(socket, config);
   }),
 }) {
+  static readonly layerWithSocket = (
+    config: typeof CdpConfig.Type,
+    socketEffect: Effect.Effect<Socket.Socket, never, Scope.Scope>,
+  ): Layer.Layer<CdpConnection> =>
+    Layer.effect(
+      CdpConnection,
+      Effect.flatMap(socketEffect, (socket) => buildConnection(socket, config)),
+    );
+
   static readonly layer = (
     config: typeof CdpConfig.Type,
     webSocketConstructor: Layer.Layer<Socket.WebSocketConstructor>,

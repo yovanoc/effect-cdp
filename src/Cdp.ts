@@ -9,8 +9,10 @@ import {
   Layer,
   Ref,
   Schema,
+  Scope,
   Stream,
 } from "effect";
+import { Socket } from "effect/unstable/socket";
 
 import { CdpConfig } from "./CdpConfig.js";
 import { CdpConnection } from "./CdpConnection.js";
@@ -151,6 +153,15 @@ export class Cdp extends Context.Service<Cdp, CdpService>()("Cdp", {
       : { ...base, __testPendingSize: Ref.get(pendingCounter) };
   }),
 }) {
+  static readonly layerWithSocket = (
+    config: typeof CdpConfig.Type,
+    socketEffect: Effect.Effect<Socket.Socket, never, Scope.Scope>,
+  ): Layer.Layer<Cdp, never, never> =>
+    Layer.effect(Cdp, Cdp.make()).pipe(
+      Layer.provide(CdpConnection.layerWithSocket(config, socketEffect)),
+      Layer.orDie,
+    );
+
   static readonly layerNode = (
     config: typeof CdpConfig.Type,
   ): Layer.Layer<Cdp, never, never> =>

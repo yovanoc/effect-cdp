@@ -15,10 +15,7 @@ export const makeSocketBridge = Effect.fnUntraced(function* (
       .run((chunk) => {
         Queue.offerUnsafe(queue, chunk);
       })
-      .pipe(
-        Effect.catch(() => Effect.void),
-        Effect.ensuring(Queue.end(queue)),
-      ),
+      .pipe(Effect.ensuring(Queue.end(queue))),
   );
   return {
     stream: Stream.fromQueue(queue),
