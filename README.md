@@ -14,8 +14,6 @@ bun add effect-cdp effect@beta @effect/platform-bun@beta
 npm install effect-cdp effect@beta @effect/platform-node@beta
 ```
 
-````
-
 ## Quickstart
 
 ### Bun
