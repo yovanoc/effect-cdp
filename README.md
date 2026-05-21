@@ -97,6 +97,27 @@ const program = Effect.gen(function* () {
 
 This only works in runtimes that support Cloudflare's non-standard `fetch` WebSocket upgrade (e.g., Cloudflare Workers, Wrangler local dev).
 
+## Reconnect
+
+Connection drops happen. Add automatic reconnection with exponential backoff:
+
+```typescript
+const config = CdpConfig.make({
+  webSocketDebuggerUrl: "ws://localhost:9222/devtools/browser/<id>",
+  eventBufferSize: 256,
+  reconnect: {
+    maxRetries: 3,
+    baseDelay: Duration.millis(1000),
+  },
+});
+
+const program = Effect.gen(function* () {
+  const cdp = yield* Cdp;
+  // ...
+}).pipe(Effect.provide(Cdp.layerBun(config)));
+```
+
+When `reconnect` is set, the initial socket connection retries with exponential backoff before failing.
 ## Feature Matrix
 
 | Feature                                   | Status | Notes                                    |

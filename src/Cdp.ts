@@ -10,6 +10,7 @@ import {
   Ref,
   Schema,
   Scope,
+  Schedule,
   Stream,
 } from "effect";
 import { Socket } from "effect/unstable/socket";
@@ -156,11 +157,21 @@ export class Cdp extends Context.Service<Cdp, CdpService>()("Cdp", {
   static readonly layerWithSocket = (
     config: typeof CdpConfig.Type,
     socketEffect: Effect.Effect<Socket.Socket, never, Scope.Scope>,
-  ): Layer.Layer<Cdp, never, never> =>
-    Layer.effect(Cdp, Cdp.make()).pipe(
-      Layer.provide(CdpConnection.layerWithSocket(config, socketEffect)),
+  ): Layer.Layer<Cdp, never, never> => {
+    const socket = config.reconnect
+      ? socketEffect.pipe(
+          Effect.retry({
+            schedule: Schedule.exponential(config.reconnect.baseDelay),
+            times: config.reconnect.maxRetries,
+          }),
+        )
+      : socketEffect;
+
+    return Layer.effect(Cdp, Cdp.make()).pipe(
+      Layer.provide(CdpConnection.layerWithSocket(config, socket)),
       Layer.orDie,
     );
+  };
 
   static readonly layerNode = (
     config: typeof CdpConfig.Type,

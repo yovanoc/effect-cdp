@@ -6,6 +6,12 @@ export const CdpConfig = Schema.Struct({
     Schema.isGreaterThanOrEqualTo(16),
   ),
   defaultTimeout: Schema.optional(Schema.DurationFromMillis),
+  reconnect: Schema.optional(
+    Schema.Struct({
+      maxRetries: Schema.Number,
+      baseDelay: Schema.DurationFromMillis,
+    }),
+  ),
 }).annotate({
   identifier: "CdpConfig",
 });
