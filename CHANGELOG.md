@@ -1,5 +1,11 @@
 # effect-cdp
 
+## 0.1.6
+
+### Patch Changes
+
+- [#8](https://github.com/yovanoc/effect-cdp/pull/8) [`a24a83e`](https://github.com/yovanoc/effect-cdp/commit/a24a83ed605367bc4ce7c9497123776b6757315e) Thanks [@yovanoc](https://github.com/yovanoc)! - Prevent bundler from code-splitting platform imports (`@effect/platform-node`, `@effect/platform-bun`) by using variable-based `import()` that rolldown cannot statically analyse. Type aliases preserve full autocomplete without `as` casts.
+
 ## 0.1.5
 
 ### Patch Changes
