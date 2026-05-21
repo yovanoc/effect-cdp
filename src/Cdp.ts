@@ -84,8 +84,11 @@ const effectFromExit = <A, E>(exit: Exit.Exit<A, E>): Effect.Effect<A, E> =>
     onFailure: Effect.failCause,
   });
 
-const _modNode = "@effect/platform-node" as string;
-const _modBun = "@effect/platform-bun" as string;
+const _modNode = "@effect/platform-node";
+const _modBun = "@effect/platform-bun";
+
+type _NodePlatform = typeof import("@effect/platform-node");
+type _BunPlatform = typeof import("@effect/platform-bun");
 
 export class Cdp extends Context.Service<Cdp, CdpService>()("Cdp", {
   make: Effect.fnUntraced(function* () {
@@ -180,9 +183,9 @@ export class Cdp extends Context.Service<Cdp, CdpService>()("Cdp", {
     Layer.effect(
       Cdp,
       Effect.gen(function* () {
-        const { NodeSocket } = yield* Effect.promise(
+        const { NodeSocket } = yield* Effect.promise<_NodePlatform>(
           () => import(_modNode),
-        ) as Effect.Effect<typeof import("@effect/platform-node")>;
+        );
         return yield* Cdp.make().pipe(
           Effect.provide(
             CdpConnection.layer(config, NodeSocket.layerWebSocketConstructor),
@@ -197,9 +200,9 @@ export class Cdp extends Context.Service<Cdp, CdpService>()("Cdp", {
     Layer.effect(
       Cdp,
       Effect.gen(function* () {
-        const { BunSocket } = yield* Effect.promise(
+        const { BunSocket } = yield* Effect.promise<_BunPlatform>(
           () => import(_modBun),
-        ) as Effect.Effect<typeof import("@effect/platform-bun")>;
+        );
         return yield* Cdp.make().pipe(
           Effect.provide(
             CdpConnection.layer(config, BunSocket.layerWebSocketConstructor),
