@@ -1,5 +1,11 @@
 # effect-cdp
 
+## 0.1.3
+
+### Patch Changes
+
+- [`e661c49`](https://github.com/yovanoc/effect-cdp/commit/e661c49a007ef22e8236c554f724c83ac8972a58) Thanks [@yovanoc](https://github.com/yovanoc)! - Add `reconnect` option to `CdpConfig` for automatic connection retry with exponential backoff. When set, the initial WebSocket connection retries with `maxRetries` and `baseDelay` before failing.
+
 ## 0.1.2
 
 ### Patch Changes
