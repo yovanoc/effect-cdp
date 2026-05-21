@@ -178,7 +178,7 @@ export class Cdp extends Context.Service<Cdp, CdpService>()("Cdp", {
       Cdp,
       Effect.gen(function* () {
         const { NodeSocket } = yield* Effect.promise(
-          () => import("@effect/platform-node"),
+          () => import(/* @rolldown-ignore */ "@effect/platform-node"),
         );
         return yield* Cdp.make().pipe(
           Effect.provide(
@@ -195,7 +195,7 @@ export class Cdp extends Context.Service<Cdp, CdpService>()("Cdp", {
       Cdp,
       Effect.gen(function* () {
         const { BunSocket } = yield* Effect.promise(
-          () => import("@effect/platform-bun"),
+          () => import(/* @rolldown-ignore */ "@effect/platform-bun"),
         );
         return yield* Cdp.make().pipe(
           Effect.provide(
