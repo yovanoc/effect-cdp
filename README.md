@@ -118,6 +118,7 @@ const program = Effect.gen(function* () {
 ```
 
 When `reconnect` is set, the initial socket connection retries with exponential backoff before failing.
+
 ## Feature Matrix
 
 | Feature                                   | Status | Notes                                    |

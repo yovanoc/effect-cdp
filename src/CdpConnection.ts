@@ -36,7 +36,10 @@ const buildConnection = (
     const pending = yield* PendingMap.make;
     const sessionRegistry = yield* SessionRegistry.make;
 
-    const socketClose = bridge.close;
+    const socketClose = Effect.gen(function* () {
+      const writer = yield* socket.writer;
+      yield* writer(new Socket.CloseEvent(1000)).pipe(Effect.ignore);
+    }).pipe(Effect.ignore, Effect.andThen(bridge.close));
     const pendingDrain = pending.drainAll("ScopeFinalized");
 
     // Register first so it runs last (LIFO).
