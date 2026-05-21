@@ -1,5 +1,11 @@
 # effect-cdp
 
+## 0.1.4
+
+### Patch Changes
+
+- [`9ecc5b7`](https://github.com/yovanoc/effect-cdp/commit/9ecc5b7fbe4b7ec9883c8c9fb06c64e1908e4b8c) Thanks [@yovanoc](https://github.com/yovanoc)! - Fix worker startup crash by lazy-loading `@effect/platform-node` and `@effect/platform-bun` in `layerNode`/`layerBun` methods. Module-level imports caused `node:net` errors in Cloudflare Workers. Use `Effect.promise(() => import(...))` to defer loading until the layer is actually built.
+
 ## 0.1.3
 
 ### Patch Changes
