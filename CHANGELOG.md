@@ -1,5 +1,11 @@
 # effect-cdp
 
+## 0.1.5
+
+### Patch Changes
+
+- [#6](https://github.com/yovanoc/effect-cdp/pull/6) [`7bd369f`](https://github.com/yovanoc/effect-cdp/commit/7bd369f9f092a0bbcade2b1bbfaaf9a8a49fa8ec) Thanks [@yovanoc](https://github.com/yovanoc)! - Prevent bundler from code-splitting `@effect/platform-node` and `@effect/platform-bun` dynamic imports by adding `@rolldown-ignore` comments. Without this, the bundler creates chunks that reference `ioredis` which is unavailable in Cloudflare Workers.
+
 ## 0.1.4
 
 ### Patch Changes
