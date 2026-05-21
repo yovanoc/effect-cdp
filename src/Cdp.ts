@@ -1,6 +1,3 @@
-import { BunSocket } from "@effect/platform-bun";
-import { NodeSocket } from "@effect/platform-node";
-
 import {
   Cause,
   Context,
@@ -177,22 +174,36 @@ export class Cdp extends Context.Service<Cdp, CdpService>()("Cdp", {
   static readonly layerNode = (
     config: typeof CdpConfig.Type,
   ): Layer.Layer<Cdp, never, never> =>
-    Layer.effect(Cdp, Cdp.make()).pipe(
-      Layer.provide(
-        CdpConnection.layer(config, NodeSocket.layerWebSocketConstructor),
-      ),
-      Layer.orDie,
-    );
+    Layer.effect(
+      Cdp,
+      Effect.gen(function* () {
+        const { NodeSocket } = yield* Effect.promise(
+          () => import("@effect/platform-node"),
+        );
+        return yield* Cdp.make().pipe(
+          Effect.provide(
+            CdpConnection.layer(config, NodeSocket.layerWebSocketConstructor),
+          ),
+        );
+      }),
+    ).pipe(Layer.orDie);
 
   static readonly layerBun = (
     config: typeof CdpConfig.Type,
   ): Layer.Layer<Cdp, never, never> =>
-    Layer.effect(Cdp, Cdp.make()).pipe(
-      Layer.provide(
-        CdpConnection.layer(config, BunSocket.layerWebSocketConstructor),
-      ),
-      Layer.orDie,
-    );
+    Layer.effect(
+      Cdp,
+      Effect.gen(function* () {
+        const { BunSocket } = yield* Effect.promise(
+          () => import("@effect/platform-bun"),
+        );
+        return yield* Cdp.make().pipe(
+          Effect.provide(
+            CdpConnection.layer(config, BunSocket.layerWebSocketConstructor),
+          ),
+        );
+      }),
+    ).pipe(Layer.orDie);
 }
 
 export type { RawCdpEvent };
