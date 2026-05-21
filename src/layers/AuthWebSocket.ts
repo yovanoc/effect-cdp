@@ -1,4 +1,4 @@
-import { Effect, Layer, Schema } from "effect";
+import { Effect, Layer, Random, Schema, Scope } from "effect";
 import { Socket } from "effect/unstable/socket";
 import { Cdp } from "../Cdp.js";
 import { CdpConfig } from "../CdpConfig.js";
@@ -53,4 +53,99 @@ const makeWsConstructorLayer = (
       return (url: string, _protocols?: string | Array<string>) =>
         new WS(url, { headers }) as unknown as globalThis.WebSocket;
     }),
+  );
+
+class WebSocketUpgradeFailed extends Schema.TaggedErrorClass<WebSocketUpgradeFailed>(
+  "WebSocketUpgradeFailed",
+)("WebSocketUpgradeFailed", {
+  status: Schema.Number,
+  body: Schema.String,
+}) {}
+
+const generateWebSocketKey = Effect.fnUntraced(function* () {
+  const bytes = yield* Effect.all(
+    Array.from({ length: 16 }, () => Random.nextIntBetween(0, 256)),
+  );
+  return btoa(String.fromCharCode(...bytes));
+});
+
+const fetchCloudflareWebSocket = Effect.fnUntraced(function* (
+  httpUrl: string,
+  headers: Record<string, string>,
+) {
+  const key = yield* generateWebSocketKey();
+
+  const response = yield* Effect.tryPromise({
+    try: () =>
+      fetch(httpUrl, {
+        headers: {
+          Upgrade: "websocket",
+          Connection: "Upgrade",
+          "Sec-WebSocket-Key": key,
+          "Sec-WebSocket-Version": "13",
+          ...headers,
+        },
+      }),
+    catch: (cause) => new Socket.SocketOpenError({ kind: "Unknown", cause }),
+  });
+
+  if (response.status !== 101) {
+    const body = yield* Effect.promise(() => response.text().catch(() => ""));
+
+    return yield* new WebSocketUpgradeFailed({
+      status: response.status,
+      body: body.slice(0, 200),
+    });
+  }
+
+  const ws = (response as unknown as { webSocket?: WebSocket }).webSocket;
+
+  if (!ws) {
+    return yield* new WebSocketUpgradeFailed({
+      status: response.status,
+      body: "Response missing WebSocket",
+    });
+  }
+
+  (ws as unknown as { accept(): void }).accept();
+
+  return ws;
+});
+
+const makeCloudflareSocket = (
+  httpUrl: string,
+  headers: Record<string, string>,
+): Effect.Effect<Socket.Socket, never, Scope.Scope> =>
+  Effect.acquireRelease(fetchCloudflareWebSocket(httpUrl, headers), (ws) =>
+    Effect.sync(() => ws.close(1000, "cleanup")),
+  ).pipe(
+    Effect.flatMap((ws) => Socket.fromWebSocket(Effect.succeed(ws))),
+    Effect.orDie,
+  );
+
+/**
+ * Creates a CDP layer for Cloudflare Workers using the native
+ * `fetch` WebSocket upgrade mechanism.
+ *
+ * Unlike {@link layerWithAuthHeaders}, this does not require the `ws` library.
+ * It uses Cloudflare's non-standard `fetch` WebSocket response to obtain a
+ * connected {@link WebSocket} directly.
+ *
+ * @example
+ * ```ts
+ * import { Cdp } from "effect-cdp"
+ * import { layerCloudflare } from "effect-cdp/layers/AuthWebSocket"
+ *
+ * const cdpLayer = layerCloudflare(config, { Authorization: "Bearer my-token" })
+ * ```
+ *
+ * @since 1.0.0
+ */
+export const layerCloudflare = (
+  config: typeof CdpConfig.Type,
+  headers: Record<string, string>,
+): Layer.Layer<Cdp, never, never> =>
+  Cdp.layerWithSocket(
+    config,
+    makeCloudflareSocket(config.webSocketDebuggerUrl, headers),
   );

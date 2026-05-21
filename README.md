@@ -78,6 +78,25 @@ const program = Effect.gen(function* () {
 }).pipe(Effect.provide(cdpLayer));
 ```
 
+## Cloudflare Workers
+
+The `ws` library does not run in Cloudflare Workers. Use `layerCloudflare` instead — it performs the WebSocket upgrade via `fetch` with custom headers and accepts the socket from the 101 response:
+
+```typescript
+import { layerCloudflare } from "effect-cdp";
+
+const cdpLayer = layerCloudflare(config, {
+  Authorization: "Bearer <token>",
+});
+
+const program = Effect.gen(function* () {
+  const cdp = yield* Cdp;
+  // ...
+}).pipe(Effect.provide(cdpLayer));
+```
+
+This only works in runtimes that support Cloudflare's non-standard `fetch` WebSocket upgrade (e.g., Cloudflare Workers, Wrangler local dev).
+
 ## Feature Matrix
 
 | Feature                                   | Status | Notes                                    |
