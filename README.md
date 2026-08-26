@@ -1,3 +1,5 @@
+
+
 # effect-cdp
 
 Type-safe [Chrome DevTools Protocol](https://chromedevtools.github.io/devtools-protocol/) client for [Effect](https://effect.website/), built on `@effect/platform` with full streaming and error handling.
@@ -49,7 +51,13 @@ Effect.runPromise(program);
 ### Node.js
 
 ```typescript
-import { Cdp } from "effect-cdp";
+import { Effect, Layer } from "effect";
+import { Cdp, CdpConfig } from "effect-cdp";
+
+const config = CdpConfig.make({
+  webSocketDebuggerUrl: "ws://localhost:9222/devtools/browser/<id>",
+  eventBufferSize: 256,
+});
 
 const program = Effect.gen(function* () {
   const cdp = yield* Cdp;
