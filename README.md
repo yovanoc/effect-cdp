@@ -1,4 +1,3 @@
-
 # effect-cdp
 
 Type-safe [Chrome DevTools Protocol](https://chromedevtools.github.io/devtools-protocol/) client for [Effect](https://effect.website/), built on `@effect/platform` with full streaming and error handling.
