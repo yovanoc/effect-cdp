@@ -12,7 +12,7 @@ export const BucketFileSystemLocator = Schema.Struct({
 export const File = Schema.Struct({
   name: Schema.String,
   lastModified: Network.TimeSinceEpoch,
-  size: Schema.Number,
+  size: Schema.Finite,
   type: Schema.String,
 }).annotate({ identifier: "FileSystem.File" });
 

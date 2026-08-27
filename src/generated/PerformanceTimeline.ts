@@ -7,7 +7,7 @@ import * as Page from "./Page.js";
 export const LargestContentfulPaint = Schema.Struct({
   renderTime: Network.TimeSinceEpoch,
   loadTime: Network.TimeSinceEpoch,
-  size: Schema.Number,
+  size: Schema.Finite,
   elementId: Schema.optional(Schema.String),
   url: Schema.optional(Schema.String),
   nodeId: Schema.optional(DOM.BackendNodeId),
@@ -20,7 +20,7 @@ export const LayoutShiftAttribution = Schema.Struct({
 }).annotate({ identifier: "PerformanceTimeline.LayoutShiftAttribution" });
 
 export const LayoutShift = Schema.Struct({
-  value: Schema.Number,
+  value: Schema.Finite,
   hadRecentInput: Schema.Boolean,
   lastInputTime: Network.TimeSinceEpoch,
   sources: Schema.Array(LayoutShiftAttribution),
@@ -31,7 +31,7 @@ export const TimelineEvent = Schema.Struct({
   type: Schema.String,
   name: Schema.String,
   time: Network.TimeSinceEpoch,
-  duration: Schema.optional(Schema.Number),
+  duration: Schema.optional(Schema.Finite),
   lcpDetails: Schema.optional(LargestContentfulPaint),
   layoutShiftDetails: Schema.optional(LayoutShift),
 }).annotate({ identifier: "PerformanceTimeline.TimelineEvent" });

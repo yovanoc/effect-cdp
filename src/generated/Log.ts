@@ -24,7 +24,7 @@ export const LogEntry = Schema.Struct({
   category: Schema.optional(Schema.Literals(["cors"])),
   timestamp: Runtime.Timestamp,
   url: Schema.optional(Schema.String),
-  lineNumber: Schema.optional(Schema.Number),
+  lineNumber: Schema.optional(Schema.Int),
   stackTrace: Schema.optional(Runtime.StackTrace),
   networkRequestId: Schema.optional(Network.RequestId),
   workerId: Schema.optional(Schema.String),
@@ -41,7 +41,7 @@ export const ViolationSetting = Schema.Struct({
     "handler",
     "recurringHandler",
   ]),
-  threshold: Schema.Number,
+  threshold: Schema.Finite,
 }).annotate({ identifier: "Log.ViolationSetting" });
 
 export const clear = {

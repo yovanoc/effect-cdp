@@ -76,7 +76,7 @@ export const openUrl = {
   method: "FedCm.openUrl" as const,
   params: Schema.Struct({
     dialogId: Schema.String,
-    accountIndex: Schema.Number,
+    accountIndex: Schema.Int,
     accountUrlType: AccountUrlType,
   }).annotate({ identifier: "FedCm.openUrl.params" }),
   result: Schema.Struct({}).annotate({ identifier: "FedCm.openUrl.result" }),
@@ -96,7 +96,7 @@ export const selectAccount = {
   method: "FedCm.selectAccount" as const,
   params: Schema.Struct({
     dialogId: Schema.String,
-    accountIndex: Schema.Number,
+    accountIndex: Schema.Int,
   }).annotate({ identifier: "FedCm.selectAccount.params" }),
   result: Schema.Struct({}).annotate({
     identifier: "FedCm.selectAccount.result",

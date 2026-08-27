@@ -14,11 +14,11 @@ export const KeyframesRule = Schema.Struct({
 }).annotate({ identifier: "Animation.KeyframesRule" });
 
 export const AnimationEffect = Schema.Struct({
-  delay: Schema.Number,
-  endDelay: Schema.Number,
-  iterationStart: Schema.Number,
-  iterations: Schema.optional(Schema.Number),
-  duration: Schema.Number,
+  delay: Schema.Finite,
+  endDelay: Schema.Finite,
+  iterationStart: Schema.Finite,
+  iterations: Schema.optional(Schema.Finite),
+  duration: Schema.Finite,
   direction: Schema.String,
   fill: Schema.String,
   backendNodeId: Schema.optional(DOM.BackendNodeId),
@@ -28,8 +28,8 @@ export const AnimationEffect = Schema.Struct({
 
 export const ViewOrScrollTimeline = Schema.Struct({
   sourceNodeId: Schema.optional(DOM.BackendNodeId),
-  startOffset: Schema.optional(Schema.Number),
-  endOffset: Schema.optional(Schema.Number),
+  startOffset: Schema.optional(Schema.Finite),
+  endOffset: Schema.optional(Schema.Finite),
   subjectNodeId: Schema.optional(DOM.BackendNodeId),
   axis: DOM.ScrollOrientation,
 }).annotate({ identifier: "Animation.ViewOrScrollTimeline" });
@@ -39,9 +39,9 @@ export const Animation = Schema.Struct({
   name: Schema.String,
   pausedState: Schema.Boolean,
   playState: Schema.String,
-  playbackRate: Schema.Number,
-  startTime: Schema.Number,
-  currentTime: Schema.Number,
+  playbackRate: Schema.Finite,
+  startTime: Schema.Finite,
+  currentTime: Schema.Finite,
   type: Schema.Literals(["CSSTransition", "CSSAnimation", "WebAnimation"]),
   source: Schema.optional(AnimationEffect),
   cssId: Schema.optional(Schema.String),
@@ -70,7 +70,7 @@ export const getCurrentTime = {
     id: Schema.String,
   }).annotate({ identifier: "Animation.getCurrentTime.params" }),
   result: Schema.Struct({
-    currentTime: Schema.Number,
+    currentTime: Schema.Finite,
   }).annotate({ identifier: "Animation.getCurrentTime.result" }),
 } as const;
 
@@ -80,7 +80,7 @@ export const getPlaybackRate = {
     identifier: "Animation.getPlaybackRate.params",
   }),
   result: Schema.Struct({
-    playbackRate: Schema.Number,
+    playbackRate: Schema.Finite,
   }).annotate({ identifier: "Animation.getPlaybackRate.result" }),
 } as const;
 
@@ -108,7 +108,7 @@ export const seekAnimations = {
   method: "Animation.seekAnimations" as const,
   params: Schema.Struct({
     animations: Schema.Array(Schema.String),
-    currentTime: Schema.Number,
+    currentTime: Schema.Finite,
   }).annotate({ identifier: "Animation.seekAnimations.params" }),
   result: Schema.Struct({}).annotate({
     identifier: "Animation.seekAnimations.result",
@@ -129,7 +129,7 @@ export const setPaused = {
 export const setPlaybackRate = {
   method: "Animation.setPlaybackRate" as const,
   params: Schema.Struct({
-    playbackRate: Schema.Number,
+    playbackRate: Schema.Finite,
   }).annotate({ identifier: "Animation.setPlaybackRate.params" }),
   result: Schema.Struct({}).annotate({
     identifier: "Animation.setPlaybackRate.result",
@@ -140,8 +140,8 @@ export const setTiming = {
   method: "Animation.setTiming" as const,
   params: Schema.Struct({
     animationId: Schema.String,
-    duration: Schema.Number,
-    delay: Schema.Number,
+    duration: Schema.Finite,
+    delay: Schema.Finite,
   }).annotate({ identifier: "Animation.setTiming.params" }),
   result: Schema.Struct({}).annotate({
     identifier: "Animation.setTiming.result",

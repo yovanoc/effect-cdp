@@ -4,8 +4,8 @@ import * as Runtime from "./Runtime.js";
 
 export const BreakLocation = Schema.Struct({
   scriptId: Runtime.ScriptId,
-  lineNumber: Schema.Number,
-  columnNumber: Schema.optional(Schema.Number),
+  lineNumber: Schema.Int,
+  columnNumber: Schema.optional(Schema.Int),
   type: Schema.optional(
     Schema.Literals(["debuggerStatement", "call", "return"]),
   ),
@@ -21,8 +21,8 @@ export const CallFrameId = Schema.String.annotate({
 
 export const Location = Schema.Struct({
   scriptId: Runtime.ScriptId,
-  lineNumber: Schema.Number,
-  columnNumber: Schema.optional(Schema.Number),
+  lineNumber: Schema.Int,
+  columnNumber: Schema.optional(Schema.Int),
 }).annotate({ identifier: "Debugger.Location" });
 
 export const Scope = Schema.Struct({
@@ -62,8 +62,8 @@ export const DebugSymbols = Schema.Struct({
 }).annotate({ identifier: "Debugger.DebugSymbols" });
 
 export const ScriptPosition = Schema.Struct({
-  lineNumber: Schema.Number,
-  columnNumber: Schema.Number,
+  lineNumber: Schema.Int,
+  columnNumber: Schema.Int,
 }).annotate({ identifier: "Debugger.ScriptPosition" });
 
 export const LocationRange = Schema.Struct({
@@ -83,13 +83,13 @@ export const ScriptLanguage = Schema.Literals([
 ]).annotate({ identifier: "Debugger.ScriptLanguage" });
 
 export const SearchMatch = Schema.Struct({
-  lineNumber: Schema.Number,
+  lineNumber: Schema.Finite,
   lineContent: Schema.String,
 }).annotate({ identifier: "Debugger.SearchMatch" });
 
 export const WasmDisassemblyChunk = Schema.Struct({
   lines: Schema.Array(Schema.String),
-  bytecodeOffsets: Schema.Array(Schema.Number),
+  bytecodeOffsets: Schema.Array(Schema.Int),
 }).annotate({ identifier: "Debugger.WasmDisassemblyChunk" });
 
 export const continueToLocation = {
@@ -117,8 +117,8 @@ export const disassembleWasmModule = {
   }).annotate({ identifier: "Debugger.disassembleWasmModule.params" }),
   result: Schema.Struct({
     streamId: Schema.optional(Schema.String),
-    totalNumberOfLines: Schema.Number,
-    functionBodyOffsets: Schema.Array(Schema.Number),
+    totalNumberOfLines: Schema.Int,
+    functionBodyOffsets: Schema.Array(Schema.Int),
     chunk: WasmDisassemblyChunk,
   }).annotate({ identifier: "Debugger.disassembleWasmModule.result" }),
 } as const;
@@ -128,7 +128,7 @@ export const enable = {
   params: Schema.Struct({
     /** @experimental The maximum size in bytes of collected scripts (not referenced by other heap objects)
     the debugger can hold. Puts no limit if parameter is omitted. */
-    maxScriptsCacheSize: Schema.optional(Schema.Number),
+    maxScriptsCacheSize: Schema.optional(Schema.Finite),
   }).annotate({ identifier: "Debugger.enable.params" }),
   result: Schema.Struct({
     /** @experimental Unique identifier of the debugger. */
@@ -150,6 +150,8 @@ export const evaluateOnCallFrame = {
     throwOnSideEffect: Schema.optional(Schema.Boolean),
     /** @experimental Terminate execution after timing out (number of milliseconds). */
     timeout: Schema.optional(Runtime.TimeDelta),
+    /** @experimental Specifies the scope number to evaluate the expression in (default: 0, innermost scope). */
+    scopeNumber: Schema.optional(Schema.Int),
   }).annotate({ identifier: "Debugger.evaluateOnCallFrame.params" }),
   result: Schema.Struct({
     result: Runtime.RemoteObject,
@@ -285,7 +287,7 @@ export const searchInContent = {
 export const setAsyncCallStackDepth = {
   method: "Debugger.setAsyncCallStackDepth" as const,
   params: Schema.Struct({
-    maxDepth: Schema.Number,
+    maxDepth: Schema.Int,
   }).annotate({ identifier: "Debugger.setAsyncCallStackDepth.params" }),
   result: Schema.Struct({}).annotate({
     identifier: "Debugger.setAsyncCallStackDepth.result",
@@ -349,11 +351,11 @@ export const setBreakpoint = {
 export const setBreakpointByUrl = {
   method: "Debugger.setBreakpointByUrl" as const,
   params: Schema.Struct({
-    lineNumber: Schema.Number,
+    lineNumber: Schema.Int,
     url: Schema.optional(Schema.String),
     urlRegex: Schema.optional(Schema.String),
     scriptHash: Schema.optional(Schema.String),
-    columnNumber: Schema.optional(Schema.Number),
+    columnNumber: Schema.optional(Schema.Int),
     condition: Schema.optional(Schema.String),
   }).annotate({ identifier: "Debugger.setBreakpointByUrl.params" }),
   result: Schema.Struct({
@@ -420,6 +422,7 @@ export const setReturnValue = {
   }),
 } as const;
 
+/** @deprecated Live edit is no longer supported and this command always fails with a "no longer available" error. */
 export const setScriptSource = {
   method: "Debugger.setScriptSource" as const,
   params: Schema.Struct({
@@ -466,7 +469,7 @@ export const setSkipAllPauses = {
 export const setVariableValue = {
   method: "Debugger.setVariableValue" as const,
   params: Schema.Struct({
-    scopeNumber: Schema.Number,
+    scopeNumber: Schema.Int,
     variableName: Schema.String,
     newValue: Runtime.CallArgument,
     callFrameId: CallFrameId,
@@ -556,10 +559,10 @@ export const scriptFailedToParse = {
   params: Schema.Struct({
     scriptId: Runtime.ScriptId,
     url: Schema.String,
-    startLine: Schema.Number,
-    startColumn: Schema.Number,
-    endLine: Schema.Number,
-    endColumn: Schema.Number,
+    startLine: Schema.Int,
+    startColumn: Schema.Int,
+    endLine: Schema.Int,
+    endColumn: Schema.Int,
     executionContextId: Runtime.ExecutionContextId,
     hash: Schema.String,
     buildId: Schema.String,
@@ -567,11 +570,11 @@ export const scriptFailedToParse = {
     sourceMapURL: Schema.optional(Schema.String),
     hasSourceURL: Schema.optional(Schema.Boolean),
     isModule: Schema.optional(Schema.Boolean),
-    length: Schema.optional(Schema.Number),
+    length: Schema.optional(Schema.Int),
     /** @experimental JavaScript top stack frame of where the script parsed event was triggered if available. */
     stackTrace: Schema.optional(Runtime.StackTrace),
     /** @experimental If the scriptLanguage is WebAssembly, the code section offset in the module. */
-    codeOffset: Schema.optional(Schema.Number),
+    codeOffset: Schema.optional(Schema.Int),
     /** @experimental The language of the script. */
     scriptLanguage: Schema.optional(ScriptLanguage),
     /** @experimental The name the embedder supplied for this script. */
@@ -584,10 +587,10 @@ export const scriptParsed = {
   params: Schema.Struct({
     scriptId: Runtime.ScriptId,
     url: Schema.String,
-    startLine: Schema.Number,
-    startColumn: Schema.Number,
-    endLine: Schema.Number,
-    endColumn: Schema.Number,
+    startLine: Schema.Int,
+    startColumn: Schema.Int,
+    endLine: Schema.Int,
+    endColumn: Schema.Int,
     executionContextId: Runtime.ExecutionContextId,
     hash: Schema.String,
     buildId: Schema.String,
@@ -597,11 +600,11 @@ export const scriptParsed = {
     sourceMapURL: Schema.optional(Schema.String),
     hasSourceURL: Schema.optional(Schema.Boolean),
     isModule: Schema.optional(Schema.Boolean),
-    length: Schema.optional(Schema.Number),
+    length: Schema.optional(Schema.Int),
     /** @experimental JavaScript top stack frame of where the script parsed event was triggered if available. */
     stackTrace: Schema.optional(Runtime.StackTrace),
     /** @experimental If the scriptLanguage is WebAssembly, the code section offset in the module. */
-    codeOffset: Schema.optional(Schema.Number),
+    codeOffset: Schema.optional(Schema.Int),
     /** @experimental The language of the script. */
     scriptLanguage: Schema.optional(ScriptLanguage),
     /** @experimental If the scriptLanguage is WebAssembly, the source of debug symbols for the module. */

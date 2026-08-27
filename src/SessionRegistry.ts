@@ -19,7 +19,7 @@ export class SessionRegistry extends Context.Service<
     readonly get: (
       sessionId: SessionId,
     ) => Effect.Effect<Option.Option<SessionRegistryEntry>>;
-    readonly getAll: () => Effect.Effect<ReadonlyArray<SessionId>>;
+    readonly getAll: Effect.Effect<ReadonlyArray<SessionId>>;
   }
 >()("SessionRegistry") {
   static readonly make: Effect.Effect<SessionRegistry["Service"]> = Effect.gen(
@@ -55,9 +55,9 @@ export class SessionRegistry extends Context.Service<
         );
       });
 
-      const getAll = Effect.fnUntraced(function* () {
-        return Array.from(HashMap.keys(yield* Ref.get(sessions)));
-      });
+      const getAll = Ref.get(sessions).pipe(
+        Effect.map((sessions) => Array.from(HashMap.keys(sessions))),
+      );
 
       return SessionRegistry.of({
         attach,

@@ -2,8 +2,8 @@ import type { Property, TypeDef, TypeRef } from "../types.js";
 
 const primitiveSchemas = {
   string: "Schema.String",
-  integer: "Schema.Number",
-  number: "Schema.Number",
+  integer: "Schema.Int",
+  number: "Schema.Finite",
   boolean: "Schema.Boolean",
   any: "Schema.Json",
 } satisfies Readonly<Record<string, string>>;

@@ -237,7 +237,7 @@ export const getChildAXNodes = {
 export const getFullAXTree = {
   method: "Accessibility.getFullAXTree" as const,
   params: Schema.Struct({
-    depth: Schema.optional(Schema.Number),
+    depth: Schema.optional(Schema.Int),
     frameId: Schema.optional(Page.FrameId),
   }).annotate({ identifier: "Accessibility.getFullAXTree.params" }),
   result: Schema.Struct({

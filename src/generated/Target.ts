@@ -10,7 +10,7 @@ export const FilterEntry = Schema.Struct({
 
 export const RemoteLocation = Schema.Struct({
   host: Schema.String,
-  port: Schema.Number,
+  port: Schema.Int,
 }).annotate({ identifier: "Target.RemoteLocation" });
 
 export const SessionID = Schema.String.annotate({
@@ -40,6 +40,7 @@ export const TargetInfo = Schema.Struct({
     Schema.suspend(() => Browser.BrowserContextID),
   ),
   subtype: Schema.optional(Schema.String),
+  embedderData: Schema.optional(Schema.Json),
 }).annotate({ identifier: "Target.TargetInfo" });
 
 export const WindowState = Schema.Literals([
@@ -135,11 +136,11 @@ export const createTarget = {
   params: Schema.Struct({
     url: Schema.String,
     /** @experimental Frame left origin in DIP (requires newWindow to be true or headless shell). */
-    left: Schema.optional(Schema.Number),
+    left: Schema.optional(Schema.Int),
     /** @experimental Frame top origin in DIP (requires newWindow to be true or headless shell). */
-    top: Schema.optional(Schema.Number),
-    width: Schema.optional(Schema.Number),
-    height: Schema.optional(Schema.Number),
+    top: Schema.optional(Schema.Int),
+    width: Schema.optional(Schema.Int),
+    height: Schema.optional(Schema.Int),
     windowState: Schema.optional(WindowState),
     /** @experimental The browser context to create the page in. */
     browserContextId: Schema.optional(
@@ -156,13 +157,11 @@ export const createTarget = {
     present in the tab UI strip. Cannot be created with `forTab: true`, `newWindow: true` or
     `background: false`. The life-time of the tab is limited to the life-time of the session. */
     hidden: Schema.optional(Schema.Boolean),
-    /** @experimental If specified, the option is used to determine if the new target should
-    be focused or not. By default, the focus behavior depends on the
-    value of the background field. For example, background=false and focus=false
-    will result in the target tab being opened but the browser window remain
-    unchanged (if it was in the background, it will remain in the background)
-    and background=false with focus=undefined will result in the window being focused.
-    Using background: true and focus: true is not supported and will result in an error. */
+    /** @experimental If specified, determines whether the new target should be focused.
+    By default, the focus behavior depends on the `background` parameter:
+    - If `background` is false (default) and `focus` is omitted, the new target is focused and the browser window is brought to the foreground.
+    - If `background` is false and `focus` is false, the target is opened but the browser window's focus remains unchanged (e.g., if the window was in the background, it stays there).
+    - If `background` is true, setting `focus` to true is not supported and will result in an error. */
     focus: Schema.optional(Schema.Boolean),
   }).annotate({ identifier: "Target.createTarget.params" }),
   result: Schema.Struct({
@@ -370,7 +369,7 @@ export const targetCrashed = {
   params: Schema.Struct({
     targetId: TargetID,
     status: Schema.String,
-    errorCode: Schema.Number,
+    errorCode: Schema.Int,
   }).annotate({ identifier: "Target.targetCrashed.params" }),
 } as const;
 

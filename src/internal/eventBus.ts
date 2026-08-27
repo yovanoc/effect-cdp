@@ -25,7 +25,7 @@ export class EventBus extends Context.Service<
   EventBus,
   {
     readonly publish: (event: RawCdpEvent) => Effect.Effect<void>;
-    readonly subscribe: () => Stream.Stream<RawCdpEvent>;
+    readonly subscribe: Stream.Stream<RawCdpEvent>;
   }
 >()("effect-cdp/internal/EventBus") {
   static readonly make = (
@@ -64,7 +64,7 @@ export class EventBus extends Context.Service<
 
       return EventBus.of({
         publish: (event) => publish(event),
-        subscribe: () => Stream.fromPubSub(pubsub),
+        subscribe: Stream.fromPubSub(pubsub),
       });
     });
 

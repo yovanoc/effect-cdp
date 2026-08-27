@@ -26,28 +26,28 @@ export const Layer = Schema.Struct({
   layerId: LayerId,
   parentLayerId: Schema.optional(LayerId),
   backendNodeId: Schema.optional(DOM.BackendNodeId),
-  offsetX: Schema.Number,
-  offsetY: Schema.Number,
-  width: Schema.Number,
-  height: Schema.Number,
-  transform: Schema.optional(Schema.Array(Schema.Number)),
-  anchorX: Schema.optional(Schema.Number),
-  anchorY: Schema.optional(Schema.Number),
-  anchorZ: Schema.optional(Schema.Number),
-  paintCount: Schema.Number,
+  offsetX: Schema.Finite,
+  offsetY: Schema.Finite,
+  width: Schema.Finite,
+  height: Schema.Finite,
+  transform: Schema.optional(Schema.Array(Schema.Finite)),
+  anchorX: Schema.optional(Schema.Finite),
+  anchorY: Schema.optional(Schema.Finite),
+  anchorZ: Schema.optional(Schema.Finite),
+  paintCount: Schema.Int,
   drawsContent: Schema.Boolean,
   invisible: Schema.optional(Schema.Boolean),
   scrollRects: Schema.optional(Schema.Array(ScrollRect)),
   stickyPositionConstraint: Schema.optional(StickyPositionConstraint),
 }).annotate({ identifier: "LayerTree.Layer" });
 
-export const PaintProfile = Schema.Array(Schema.Number).annotate({
+export const PaintProfile = Schema.Array(Schema.Finite).annotate({
   identifier: "LayerTree.PaintProfile",
 });
 
 export const PictureTile = Schema.Struct({
-  x: Schema.Number,
-  y: Schema.Number,
+  x: Schema.Finite,
+  y: Schema.Finite,
   picture: Schema.String,
 }).annotate({ identifier: "LayerTree.PictureTile" });
 
@@ -106,8 +106,8 @@ export const profileSnapshot = {
   method: "LayerTree.profileSnapshot" as const,
   params: Schema.Struct({
     snapshotId: SnapshotId,
-    minRepeatCount: Schema.optional(Schema.Number),
-    minDuration: Schema.optional(Schema.Number),
+    minRepeatCount: Schema.optional(Schema.Int),
+    minDuration: Schema.optional(Schema.Finite),
     clipRect: Schema.optional(DOM.Rect),
   }).annotate({ identifier: "LayerTree.profileSnapshot.params" }),
   result: Schema.Struct({
@@ -129,9 +129,9 @@ export const replaySnapshot = {
   method: "LayerTree.replaySnapshot" as const,
   params: Schema.Struct({
     snapshotId: SnapshotId,
-    fromStep: Schema.optional(Schema.Number),
-    toStep: Schema.optional(Schema.Number),
-    scale: Schema.optional(Schema.Number),
+    fromStep: Schema.optional(Schema.Int),
+    toStep: Schema.optional(Schema.Int),
+    scale: Schema.optional(Schema.Finite),
   }).annotate({ identifier: "LayerTree.replaySnapshot.params" }),
   result: Schema.Struct({
     dataURL: Schema.String,

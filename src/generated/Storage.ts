@@ -3,38 +3,6 @@ import { Schema } from "effect";
 import * as Browser from "./Browser.js";
 import * as Network from "./Network.js";
 import * as Page from "./Page.js";
-import * as Target from "./Target.js";
-
-export const InterestGroupAccessType = Schema.Literals([
-  "join",
-  "leave",
-  "update",
-  "loaded",
-  "bid",
-  "win",
-  "additionalBid",
-  "additionalBidWin",
-  "topLevelBid",
-  "topLevelAdditionalBid",
-  "clear",
-]).annotate({ identifier: "Storage.InterestGroupAccessType" });
-
-export const InterestGroupAuctionEventType = Schema.Literals([
-  "started",
-  "configResolved",
-]).annotate({ identifier: "Storage.InterestGroupAuctionEventType" });
-
-export const InterestGroupAuctionFetchType = Schema.Literals([
-  "bidderJs",
-  "bidderWasm",
-  "sellerJs",
-  "bidderTrustedSignals",
-  "sellerTrustedSignals",
-]).annotate({ identifier: "Storage.InterestGroupAuctionFetchType" });
-
-export const InterestGroupAuctionId = Schema.String.annotate({
-  identifier: "Storage.InterestGroupAuctionId",
-});
 
 export const RelatedWebsiteSet = Schema.Struct({
   primarySites: Schema.Array(Schema.String),
@@ -45,82 +13,6 @@ export const RelatedWebsiteSet = Schema.Struct({
 export const SerializedStorageKey = Schema.String.annotate({
   identifier: "Storage.SerializedStorageKey",
 });
-
-export const SharedStorageAccessMethod = Schema.Literals([
-  "addModule",
-  "createWorklet",
-  "selectURL",
-  "run",
-  "batchUpdate",
-  "set",
-  "append",
-  "delete",
-  "clear",
-  "get",
-  "keys",
-  "values",
-  "entries",
-  "length",
-  "remainingBudget",
-]).annotate({ identifier: "Storage.SharedStorageAccessMethod" });
-
-export const SharedStoragePrivateAggregationConfig = Schema.Struct({
-  aggregationCoordinatorOrigin: Schema.optional(Schema.String),
-  contextId: Schema.optional(Schema.String),
-  filteringIdMaxBytes: Schema.Number,
-  maxContributions: Schema.optional(Schema.Number),
-}).annotate({ identifier: "Storage.SharedStoragePrivateAggregationConfig" });
-
-export const SharedStorageReportingMetadata = Schema.Struct({
-  eventType: Schema.String,
-  reportingUrl: Schema.String,
-}).annotate({ identifier: "Storage.SharedStorageReportingMetadata" });
-
-export const SharedStorageUrlWithMetadata = Schema.Struct({
-  url: Schema.String,
-  reportingMetadata: Schema.Array(SharedStorageReportingMetadata),
-}).annotate({ identifier: "Storage.SharedStorageUrlWithMetadata" });
-
-export const SharedStorageAccessParams = Schema.Struct({
-  scriptSourceUrl: Schema.optional(Schema.String),
-  dataOrigin: Schema.optional(Schema.String),
-  operationName: Schema.optional(Schema.String),
-  operationId: Schema.optional(Schema.String),
-  keepAlive: Schema.optional(Schema.Boolean),
-  privateAggregationConfig: Schema.optional(
-    SharedStoragePrivateAggregationConfig,
-  ),
-  serializedData: Schema.optional(Schema.String),
-  urlsWithMetadata: Schema.optional(Schema.Array(SharedStorageUrlWithMetadata)),
-  urnUuid: Schema.optional(Schema.String),
-  key: Schema.optional(Schema.String),
-  value: Schema.optional(Schema.String),
-  ignoreIfPresent: Schema.optional(Schema.Boolean),
-  workletOrdinal: Schema.optional(Schema.Number),
-  workletTargetId: Schema.optional(Target.TargetID),
-  withLock: Schema.optional(Schema.String),
-  batchUpdateId: Schema.optional(Schema.String),
-  batchSize: Schema.optional(Schema.Number),
-}).annotate({ identifier: "Storage.SharedStorageAccessParams" });
-
-export const SharedStorageAccessScope = Schema.Literals([
-  "window",
-  "sharedStorageWorklet",
-  "protectedAudienceWorklet",
-  "header",
-]).annotate({ identifier: "Storage.SharedStorageAccessScope" });
-
-export const SharedStorageEntry = Schema.Struct({
-  key: Schema.String,
-  value: Schema.String,
-}).annotate({ identifier: "Storage.SharedStorageEntry" });
-
-export const SharedStorageMetadata = Schema.Struct({
-  creationTime: Network.TimeSinceEpoch,
-  length: Schema.Number,
-  remainingBudget: Schema.Number,
-  bytesUsed: Schema.Number,
-}).annotate({ identifier: "Storage.SharedStorageMetadata" });
 
 export const StorageBucket = Schema.Struct({
   storageKey: SerializedStorageKey,
@@ -136,7 +28,7 @@ export const StorageBucketInfo = Schema.Struct({
   bucket: StorageBucket,
   id: Schema.String,
   expiration: Network.TimeSinceEpoch,
-  quota: Schema.Number,
+  quota: Schema.Finite,
   persistent: Schema.Boolean,
   durability: StorageBucketsDurability,
 }).annotate({ identifier: "Storage.StorageBucketInfo" });
@@ -150,8 +42,6 @@ export const StorageType = Schema.Literals([
   "websql",
   "service_workers",
   "cache_storage",
-  "interest_groups",
-  "shared_storage",
   "storage_buckets",
   "all",
   "other",
@@ -159,12 +49,12 @@ export const StorageType = Schema.Literals([
 
 export const TrustTokens = Schema.Struct({
   issuerOrigin: Schema.String,
-  count: Schema.Number,
+  count: Schema.Finite,
 }).annotate({ identifier: "Storage.TrustTokens" });
 
 export const UsageForType = Schema.Struct({
   storageType: StorageType,
-  usage: Schema.Number,
+  usage: Schema.Finite,
 }).annotate({ identifier: "Storage.UsageForType" });
 
 export const clearCookies = {
@@ -199,17 +89,6 @@ export const clearDataForStorageKey = {
   }),
 } as const;
 
-/** @experimental Clears all entries for a given origin's shared storage. */
-export const clearSharedStorageEntries = {
-  method: "Storage.clearSharedStorageEntries" as const,
-  params: Schema.Struct({
-    ownerOrigin: Schema.String,
-  }).annotate({ identifier: "Storage.clearSharedStorageEntries.params" }),
-  result: Schema.Struct({}).annotate({
-    identifier: "Storage.clearSharedStorageEntries.result",
-  }),
-} as const;
-
 /** @experimental Removes all Trust Tokens issued by the provided issuerOrigin.
 Leaves other stored data, including the issuer's Redemption Records, intact. */
 export const clearTrustTokens = {
@@ -220,18 +99,6 @@ export const clearTrustTokens = {
   result: Schema.Struct({
     didDeleteTokens: Schema.Boolean,
   }).annotate({ identifier: "Storage.clearTrustTokens.result" }),
-} as const;
-
-/** @experimental Deletes entry for `key` (if it exists) for a given origin's shared storage. */
-export const deleteSharedStorageEntry = {
-  method: "Storage.deleteSharedStorageEntry" as const,
-  params: Schema.Struct({
-    ownerOrigin: Schema.String,
-    key: Schema.String,
-  }).annotate({ identifier: "Storage.deleteSharedStorageEntry.params" }),
-  result: Schema.Struct({}).annotate({
-    identifier: "Storage.deleteSharedStorageEntry.result",
-  }),
 } as const;
 
 /** @experimental Deletes the Storage Bucket with the given storage key and bucket name. */
@@ -255,18 +122,6 @@ export const getCookies = {
   }).annotate({ identifier: "Storage.getCookies.result" }),
 } as const;
 
-/** @experimental Gets details for a named interest group. */
-export const getInterestGroupDetails = {
-  method: "Storage.getInterestGroupDetails" as const,
-  params: Schema.Struct({
-    ownerOrigin: Schema.String,
-    name: Schema.String,
-  }).annotate({ identifier: "Storage.getInterestGroupDetails.params" }),
-  result: Schema.Struct({
-    details: Schema.Json,
-  }).annotate({ identifier: "Storage.getInterestGroupDetails.result" }),
-} as const;
-
 /** @experimental Returns the effective Related Website Sets in use by this profile for the browser
 session. The effective Related Website Sets will not change during a browser session. */
 export const getRelatedWebsiteSets = {
@@ -277,28 +132,6 @@ export const getRelatedWebsiteSets = {
   result: Schema.Struct({
     sets: Schema.Array(RelatedWebsiteSet),
   }).annotate({ identifier: "Storage.getRelatedWebsiteSets.result" }),
-} as const;
-
-/** @experimental Gets the entries in an given origin's shared storage. */
-export const getSharedStorageEntries = {
-  method: "Storage.getSharedStorageEntries" as const,
-  params: Schema.Struct({
-    ownerOrigin: Schema.String,
-  }).annotate({ identifier: "Storage.getSharedStorageEntries.params" }),
-  result: Schema.Struct({
-    entries: Schema.Array(SharedStorageEntry),
-  }).annotate({ identifier: "Storage.getSharedStorageEntries.result" }),
-} as const;
-
-/** @experimental Gets metadata for an origin's shared storage. */
-export const getSharedStorageMetadata = {
-  method: "Storage.getSharedStorageMetadata" as const,
-  params: Schema.Struct({
-    ownerOrigin: Schema.String,
-  }).annotate({ identifier: "Storage.getSharedStorageMetadata.params" }),
-  result: Schema.Struct({
-    metadata: SharedStorageMetadata,
-  }).annotate({ identifier: "Storage.getSharedStorageMetadata.result" }),
 } as const;
 
 /** @experimental Returns storage key for the given frame. If no frame ID is provided,
@@ -343,8 +176,8 @@ export const getUsageAndQuota = {
     origin: Schema.String,
   }).annotate({ identifier: "Storage.getUsageAndQuota.params" }),
   result: Schema.Struct({
-    usage: Schema.Number,
-    quota: Schema.Number,
+    usage: Schema.Finite,
+    quota: Schema.Finite,
     overrideActive: Schema.Boolean,
     usageBreakdown: Schema.Array(UsageForType),
   }).annotate({ identifier: "Storage.getUsageAndQuota.result" }),
@@ -355,21 +188,10 @@ export const overrideQuotaForOrigin = {
   method: "Storage.overrideQuotaForOrigin" as const,
   params: Schema.Struct({
     origin: Schema.String,
-    quotaSize: Schema.optional(Schema.Number),
+    quotaSize: Schema.optional(Schema.Finite),
   }).annotate({ identifier: "Storage.overrideQuotaForOrigin.params" }),
   result: Schema.Struct({}).annotate({
     identifier: "Storage.overrideQuotaForOrigin.result",
-  }),
-} as const;
-
-/** @experimental Resets the budget for `ownerOrigin` by clearing all budget withdrawals. */
-export const resetSharedStorageBudget = {
-  method: "Storage.resetSharedStorageBudget" as const,
-  params: Schema.Struct({
-    ownerOrigin: Schema.String,
-  }).annotate({ identifier: "Storage.resetSharedStorageBudget.params" }),
-  result: Schema.Struct({}).annotate({
-    identifier: "Storage.resetSharedStorageBudget.result",
   }),
 } as const;
 
@@ -392,66 +214,6 @@ export const setCookies = {
   }).annotate({ identifier: "Storage.setCookies.params" }),
   result: Schema.Struct({}).annotate({
     identifier: "Storage.setCookies.result",
-  }),
-} as const;
-
-/** @experimental Enables/Disables issuing of interestGroupAuctionEventOccurred and
-interestGroupAuctionNetworkRequestCreated. */
-export const setInterestGroupAuctionTracking = {
-  method: "Storage.setInterestGroupAuctionTracking" as const,
-  params: Schema.Struct({
-    enable: Schema.Boolean,
-  }).annotate({ identifier: "Storage.setInterestGroupAuctionTracking.params" }),
-  result: Schema.Struct({}).annotate({
-    identifier: "Storage.setInterestGroupAuctionTracking.result",
-  }),
-} as const;
-
-/** @experimental Enables/Disables issuing of interestGroupAccessed events. */
-export const setInterestGroupTracking = {
-  method: "Storage.setInterestGroupTracking" as const,
-  params: Schema.Struct({
-    enable: Schema.Boolean,
-  }).annotate({ identifier: "Storage.setInterestGroupTracking.params" }),
-  result: Schema.Struct({}).annotate({
-    identifier: "Storage.setInterestGroupTracking.result",
-  }),
-} as const;
-
-export const setProtectedAudienceKAnonymity = {
-  method: "Storage.setProtectedAudienceKAnonymity" as const,
-  params: Schema.Struct({
-    owner: Schema.String,
-    name: Schema.String,
-    hashes: Schema.Array(Schema.String),
-  }).annotate({ identifier: "Storage.setProtectedAudienceKAnonymity.params" }),
-  result: Schema.Struct({}).annotate({
-    identifier: "Storage.setProtectedAudienceKAnonymity.result",
-  }),
-} as const;
-
-/** @experimental Sets entry with `key` and `value` for a given origin's shared storage. */
-export const setSharedStorageEntry = {
-  method: "Storage.setSharedStorageEntry" as const,
-  params: Schema.Struct({
-    ownerOrigin: Schema.String,
-    key: Schema.String,
-    value: Schema.String,
-    ignoreIfPresent: Schema.optional(Schema.Boolean),
-  }).annotate({ identifier: "Storage.setSharedStorageEntry.params" }),
-  result: Schema.Struct({}).annotate({
-    identifier: "Storage.setSharedStorageEntry.result",
-  }),
-} as const;
-
-/** @experimental Enables/disables issuing of sharedStorageAccessed events. */
-export const setSharedStorageTracking = {
-  method: "Storage.setSharedStorageTracking" as const,
-  params: Schema.Struct({
-    enable: Schema.Boolean,
-  }).annotate({ identifier: "Storage.setSharedStorageTracking.params" }),
-  result: Schema.Struct({}).annotate({
-    identifier: "Storage.setSharedStorageTracking.result",
   }),
 } as const;
 
@@ -586,72 +348,6 @@ export const indexedDBListUpdated = {
     storageKey: Schema.String,
     bucketId: Schema.String,
   }).annotate({ identifier: "Storage.indexedDBListUpdated.params" }),
-} as const;
-
-export const interestGroupAccessed = {
-  method: "Storage.interestGroupAccessed" as const,
-  params: Schema.Struct({
-    accessTime: Network.TimeSinceEpoch,
-    type: InterestGroupAccessType,
-    ownerOrigin: Schema.String,
-    name: Schema.String,
-    componentSellerOrigin: Schema.optional(Schema.String),
-    bid: Schema.optional(Schema.Number),
-    bidCurrency: Schema.optional(Schema.String),
-    uniqueAuctionId: Schema.optional(InterestGroupAuctionId),
-  }).annotate({ identifier: "Storage.interestGroupAccessed.params" }),
-} as const;
-
-export const interestGroupAuctionEventOccurred = {
-  method: "Storage.interestGroupAuctionEventOccurred" as const,
-  params: Schema.Struct({
-    eventTime: Network.TimeSinceEpoch,
-    type: InterestGroupAuctionEventType,
-    uniqueAuctionId: InterestGroupAuctionId,
-    parentAuctionId: Schema.optional(InterestGroupAuctionId),
-    auctionConfig: Schema.optional(Schema.Json),
-  }).annotate({
-    identifier: "Storage.interestGroupAuctionEventOccurred.params",
-  }),
-} as const;
-
-export const interestGroupAuctionNetworkRequestCreated = {
-  method: "Storage.interestGroupAuctionNetworkRequestCreated" as const,
-  params: Schema.Struct({
-    type: InterestGroupAuctionFetchType,
-    requestId: Network.RequestId,
-    auctions: Schema.Array(InterestGroupAuctionId),
-  }).annotate({
-    identifier: "Storage.interestGroupAuctionNetworkRequestCreated.params",
-  }),
-} as const;
-
-export const sharedStorageAccessed = {
-  method: "Storage.sharedStorageAccessed" as const,
-  params: Schema.Struct({
-    accessTime: Network.TimeSinceEpoch,
-    scope: SharedStorageAccessScope,
-    method: SharedStorageAccessMethod,
-    mainFrameId: Page.FrameId,
-    ownerOrigin: Schema.String,
-    ownerSite: Schema.String,
-    params: SharedStorageAccessParams,
-  }).annotate({ identifier: "Storage.sharedStorageAccessed.params" }),
-} as const;
-
-export const sharedStorageWorkletOperationExecutionFinished = {
-  method: "Storage.sharedStorageWorkletOperationExecutionFinished" as const,
-  params: Schema.Struct({
-    finishedTime: Network.TimeSinceEpoch,
-    executionTime: Schema.Number,
-    method: SharedStorageAccessMethod,
-    operationId: Schema.String,
-    workletTargetId: Target.TargetID,
-    mainFrameId: Page.FrameId,
-    ownerOrigin: Schema.String,
-  }).annotate({
-    identifier: "Storage.sharedStorageWorkletOperationExecutionFinished.params",
-  }),
 } as const;
 
 export const storageBucketCreatedOrUpdated = {

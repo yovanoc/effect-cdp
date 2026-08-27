@@ -18,8 +18,8 @@ export const read = {
   method: "IO.read" as const,
   params: Schema.Struct({
     handle: StreamHandle,
-    offset: Schema.optional(Schema.Number),
-    size: Schema.optional(Schema.Number),
+    offset: Schema.optional(Schema.Int),
+    size: Schema.optional(Schema.Int),
   }).annotate({ identifier: "IO.read.params" }),
   result: Schema.Struct({
     base64Encoded: Schema.optional(Schema.Boolean),

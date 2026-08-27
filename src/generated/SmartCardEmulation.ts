@@ -44,13 +44,13 @@ export const ReaderStateFlags = Schema.Struct({
 export const ReaderStateIn = Schema.Struct({
   reader: Schema.String,
   currentState: ReaderStateFlags,
-  currentInsertionCount: Schema.Number,
+  currentInsertionCount: Schema.Int,
 }).annotate({ identifier: "SmartCardEmulation.ReaderStateIn" });
 
 export const ReaderStateOut = Schema.Struct({
   reader: Schema.String,
   eventState: ReaderStateFlags,
-  eventCount: Schema.Number,
+  eventCount: Schema.Int,
   atr: Schema.String,
 }).annotate({ identifier: "SmartCardEmulation.ReaderStateOut" });
 
@@ -119,7 +119,7 @@ export const reportBeginTransactionResult = {
   method: "SmartCardEmulation.reportBeginTransactionResult" as const,
   params: Schema.Struct({
     requestId: Schema.String,
-    handle: Schema.Number,
+    handle: Schema.Int,
   }).annotate({
     identifier: "SmartCardEmulation.reportBeginTransactionResult.params",
   }),
@@ -132,7 +132,7 @@ export const reportConnectResult = {
   method: "SmartCardEmulation.reportConnectResult" as const,
   params: Schema.Struct({
     requestId: Schema.String,
-    handle: Schema.Number,
+    handle: Schema.Int,
     activeProtocol: Schema.optional(Protocol),
   }).annotate({ identifier: "SmartCardEmulation.reportConnectResult.params" }),
   result: Schema.Struct({}).annotate({
@@ -166,7 +166,7 @@ export const reportEstablishContextResult = {
   method: "SmartCardEmulation.reportEstablishContextResult" as const,
   params: Schema.Struct({
     requestId: Schema.String,
-    contextId: Schema.Number,
+    contextId: Schema.Int,
   }).annotate({
     identifier: "SmartCardEmulation.reportEstablishContextResult.params",
   }),
@@ -241,7 +241,7 @@ export const beginTransactionRequested = {
   method: "SmartCardEmulation.beginTransactionRequested" as const,
   params: Schema.Struct({
     requestId: Schema.String,
-    handle: Schema.Number,
+    handle: Schema.Int,
   }).annotate({
     identifier: "SmartCardEmulation.beginTransactionRequested.params",
   }),
@@ -251,7 +251,7 @@ export const cancelRequested = {
   method: "SmartCardEmulation.cancelRequested" as const,
   params: Schema.Struct({
     requestId: Schema.String,
-    contextId: Schema.Number,
+    contextId: Schema.Int,
   }).annotate({ identifier: "SmartCardEmulation.cancelRequested.params" }),
 } as const;
 
@@ -259,7 +259,7 @@ export const connectRequested = {
   method: "SmartCardEmulation.connectRequested" as const,
   params: Schema.Struct({
     requestId: Schema.String,
-    contextId: Schema.Number,
+    contextId: Schema.Int,
     reader: Schema.String,
     shareMode: ShareMode,
     preferredProtocols: ProtocolSet,
@@ -270,8 +270,8 @@ export const controlRequested = {
   method: "SmartCardEmulation.controlRequested" as const,
   params: Schema.Struct({
     requestId: Schema.String,
-    handle: Schema.Number,
-    controlCode: Schema.Number,
+    handle: Schema.Int,
+    controlCode: Schema.Int,
     data: Schema.String,
   }).annotate({ identifier: "SmartCardEmulation.controlRequested.params" }),
 } as const;
@@ -280,7 +280,7 @@ export const disconnectRequested = {
   method: "SmartCardEmulation.disconnectRequested" as const,
   params: Schema.Struct({
     requestId: Schema.String,
-    handle: Schema.Number,
+    handle: Schema.Int,
     disposition: Disposition,
   }).annotate({ identifier: "SmartCardEmulation.disconnectRequested.params" }),
 } as const;
@@ -289,7 +289,7 @@ export const endTransactionRequested = {
   method: "SmartCardEmulation.endTransactionRequested" as const,
   params: Schema.Struct({
     requestId: Schema.String,
-    handle: Schema.Number,
+    handle: Schema.Int,
     disposition: Disposition,
   }).annotate({
     identifier: "SmartCardEmulation.endTransactionRequested.params",
@@ -309,8 +309,8 @@ export const getAttribRequested = {
   method: "SmartCardEmulation.getAttribRequested" as const,
   params: Schema.Struct({
     requestId: Schema.String,
-    handle: Schema.Number,
-    attribId: Schema.Number,
+    handle: Schema.Int,
+    attribId: Schema.Int,
   }).annotate({ identifier: "SmartCardEmulation.getAttribRequested.params" }),
 } as const;
 
@@ -318,9 +318,9 @@ export const getStatusChangeRequested = {
   method: "SmartCardEmulation.getStatusChangeRequested" as const,
   params: Schema.Struct({
     requestId: Schema.String,
-    contextId: Schema.Number,
+    contextId: Schema.Int,
     readerStates: Schema.Array(ReaderStateIn),
-    timeout: Schema.optional(Schema.Number),
+    timeout: Schema.optional(Schema.Int),
   }).annotate({
     identifier: "SmartCardEmulation.getStatusChangeRequested.params",
   }),
@@ -330,7 +330,7 @@ export const listReadersRequested = {
   method: "SmartCardEmulation.listReadersRequested" as const,
   params: Schema.Struct({
     requestId: Schema.String,
-    contextId: Schema.Number,
+    contextId: Schema.Int,
   }).annotate({ identifier: "SmartCardEmulation.listReadersRequested.params" }),
 } as const;
 
@@ -338,7 +338,7 @@ export const releaseContextRequested = {
   method: "SmartCardEmulation.releaseContextRequested" as const,
   params: Schema.Struct({
     requestId: Schema.String,
-    contextId: Schema.Number,
+    contextId: Schema.Int,
   }).annotate({
     identifier: "SmartCardEmulation.releaseContextRequested.params",
   }),
@@ -348,8 +348,8 @@ export const setAttribRequested = {
   method: "SmartCardEmulation.setAttribRequested" as const,
   params: Schema.Struct({
     requestId: Schema.String,
-    handle: Schema.Number,
-    attribId: Schema.Number,
+    handle: Schema.Int,
+    attribId: Schema.Int,
     data: Schema.String,
   }).annotate({ identifier: "SmartCardEmulation.setAttribRequested.params" }),
 } as const;
@@ -358,7 +358,7 @@ export const statusRequested = {
   method: "SmartCardEmulation.statusRequested" as const,
   params: Schema.Struct({
     requestId: Schema.String,
-    handle: Schema.Number,
+    handle: Schema.Int,
   }).annotate({ identifier: "SmartCardEmulation.statusRequested.params" }),
 } as const;
 
@@ -366,7 +366,7 @@ export const transmitRequested = {
   method: "SmartCardEmulation.transmitRequested" as const,
   params: Schema.Struct({
     requestId: Schema.String,
-    handle: Schema.Number,
+    handle: Schema.Int,
     data: Schema.String,
     protocol: Schema.optional(Protocol),
   }).annotate({ identifier: "SmartCardEmulation.transmitRequested.params" }),

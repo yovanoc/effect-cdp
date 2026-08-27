@@ -18,8 +18,8 @@ export const ConsoleMessage = Schema.Struct({
   level: Schema.Literals(["log", "warning", "error", "debug", "info"]),
   text: Schema.String,
   url: Schema.optional(Schema.String),
-  line: Schema.optional(Schema.Number),
-  column: Schema.optional(Schema.Number),
+  line: Schema.optional(Schema.Int),
+  column: Schema.optional(Schema.Int),
 }).annotate({ identifier: "Console.ConsoleMessage" });
 
 export const clearMessages = {

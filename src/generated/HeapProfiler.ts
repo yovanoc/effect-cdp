@@ -18,16 +18,16 @@ export const SamplingHeapProfileNode: Schema.Schema<HeapProfilerSamplingHeapProf
   Schema.suspend(() =>
     Schema.Struct({
       callFrame: Runtime.CallFrame,
-      selfSize: Schema.Number,
-      id: Schema.Number,
+      selfSize: Schema.Finite,
+      id: Schema.Int,
       children: Schema.Array(SamplingHeapProfileNode),
     }),
   ).annotate({ identifier: "HeapProfiler.SamplingHeapProfileNode" });
 
 export const SamplingHeapProfileSample = Schema.Struct({
-  size: Schema.Number,
-  nodeId: Schema.Number,
-  ordinal: Schema.Number,
+  size: Schema.Finite,
+  nodeId: Schema.Int,
+  ordinal: Schema.Finite,
 }).annotate({ identifier: "HeapProfiler.SamplingHeapProfileSample" });
 
 export const SamplingHeapProfile = Schema.Struct({
@@ -109,8 +109,8 @@ export const getSamplingProfile = {
 export const startSampling = {
   method: "HeapProfiler.startSampling" as const,
   params: Schema.Struct({
-    samplingInterval: Schema.optional(Schema.Number),
-    stackDepth: Schema.optional(Schema.Number),
+    samplingInterval: Schema.optional(Schema.Finite),
+    stackDepth: Schema.optional(Schema.Finite),
     includeObjectsCollectedByMajorGC: Schema.optional(Schema.Boolean),
     includeObjectsCollectedByMinorGC: Schema.optional(Schema.Boolean),
   }).annotate({ identifier: "HeapProfiler.startSampling.params" }),
@@ -180,23 +180,23 @@ export const addHeapSnapshotChunk = {
 export const heapStatsUpdate = {
   method: "HeapProfiler.heapStatsUpdate" as const,
   params: Schema.Struct({
-    statsUpdate: Schema.Array(Schema.Number),
+    statsUpdate: Schema.Array(Schema.Int),
   }).annotate({ identifier: "HeapProfiler.heapStatsUpdate.params" }),
 } as const;
 
 export const lastSeenObjectId = {
   method: "HeapProfiler.lastSeenObjectId" as const,
   params: Schema.Struct({
-    lastSeenObjectId: Schema.Number,
-    timestamp: Schema.Number,
+    lastSeenObjectId: Schema.Int,
+    timestamp: Schema.Finite,
   }).annotate({ identifier: "HeapProfiler.lastSeenObjectId.params" }),
 } as const;
 
 export const reportHeapSnapshotProgress = {
   method: "HeapProfiler.reportHeapSnapshotProgress" as const,
   params: Schema.Struct({
-    done: Schema.Number,
-    total: Schema.Number,
+    done: Schema.Int,
+    total: Schema.Int,
     finished: Schema.optional(Schema.Boolean),
   }).annotate({ identifier: "HeapProfiler.reportHeapSnapshotProgress.params" }),
 } as const;

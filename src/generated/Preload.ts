@@ -18,7 +18,9 @@ export const PrefetchStatus = Schema.Literals([
   "PrefetchIneligibleRetryAfter",
   "PrefetchIsPrivacyDecoy",
   "PrefetchIsStale",
+  "PrefetchNotEligibleBlockedByConnectionAllowlist",
   "PrefetchNotEligibleBrowserContextOffTheRecord",
+  "PrefetchNotEligibleCrossOrigin",
   "PrefetchNotEligibleDataSaverEnabled",
   "PrefetchNotEligibleExistingProxy",
   "PrefetchNotEligibleHostIsNonUnique",
@@ -39,6 +41,7 @@ export const PrefetchStatus = Schema.Literals([
   "PrefetchResponseUsed",
   "PrefetchSuccessfulButNotUsed",
   "PrefetchNotUsedProbeFailed",
+  "PrefetchCancelledOnUserNavigation",
 ]).annotate({ identifier: "Preload.PrefetchStatus" });
 
 export const SpeculationAction = Schema.Literals([

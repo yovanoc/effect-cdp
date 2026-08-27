@@ -8,7 +8,7 @@ import {
 } from "../errors.js";
 import { CdpRequestId, type SessionId } from "../types.js";
 
-type PendingDrainReason = (typeof CdpDisconnected.Type)["reason"];
+type PendingDrainReason = CdpDisconnected["reason"];
 type PendingError =
   | CdpProtocolError
   | CdpDecodeError
@@ -72,7 +72,7 @@ export class PendingMap extends Context.Service<
       sessionId: SessionId,
       reason: PendingDrainReason,
     ) => Effect.Effect<void>;
-    readonly nextId: () => Effect.Effect<CdpRequestId>;
+    readonly nextId: Effect.Effect<CdpRequestId>;
   }
 >()("effect-cdp/internal/PendingMap") {
   static readonly make: Effect.Effect<PendingMap["Service"]> = Effect.gen(
@@ -191,17 +191,13 @@ export class PendingMap extends Context.Service<
         );
       });
 
-      const nextId = () =>
-        Ref.modify(stateRef, (state): [number, PendingState] => {
-          if (state._tag === "Closed") {
-            return [0, state];
-          }
-          const next = state.counter + 1;
-          return [
-            next,
-            { _tag: "Open", entries: state.entries, counter: next },
-          ];
-        }).pipe(Effect.map(CdpRequestId.makeUnsafe));
+      const nextId = Ref.modify(stateRef, (state): [number, PendingState] => {
+        if (state._tag === "Closed") {
+          return [0, state];
+        }
+        const next = state.counter + 1;
+        return [next, { _tag: "Open", entries: state.entries, counter: next }];
+      }).pipe(Effect.map(CdpRequestId.makeUnsafe));
 
       return PendingMap.of({
         register,

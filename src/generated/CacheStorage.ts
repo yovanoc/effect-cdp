@@ -36,8 +36,8 @@ export const DataEntry = Schema.Struct({
   requestURL: Schema.String,
   requestMethod: Schema.String,
   requestHeaders: Schema.Array(Header),
-  responseTime: Schema.Number,
-  responseStatus: Schema.Number,
+  responseTime: Schema.Finite,
+  responseStatus: Schema.Int,
   responseStatusText: Schema.String,
   responseType: CachedResponseType,
   responseHeaders: Schema.Array(Header),
@@ -92,12 +92,12 @@ export const requestEntries = {
   method: "CacheStorage.requestEntries" as const,
   params: Schema.Struct({
     cacheId: CacheId,
-    skipCount: Schema.optional(Schema.Number),
-    pageSize: Schema.optional(Schema.Number),
+    skipCount: Schema.optional(Schema.Int),
+    pageSize: Schema.optional(Schema.Int),
     pathFilter: Schema.optional(Schema.String),
   }).annotate({ identifier: "CacheStorage.requestEntries.params" }),
   result: Schema.Struct({
     cacheDataEntries: Schema.Array(DataEntry),
-    returnCount: Schema.Number,
+    returnCount: Schema.Finite,
   }).annotate({ identifier: "CacheStorage.requestEntries.result" }),
 } as const;

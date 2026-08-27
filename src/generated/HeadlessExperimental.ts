@@ -3,15 +3,15 @@ import { Schema } from "effect";
 
 export const ScreenshotParams = Schema.Struct({
   format: Schema.optional(Schema.Literals(["jpeg", "png", "webp"])),
-  quality: Schema.optional(Schema.Number),
+  quality: Schema.optional(Schema.Int),
   optimizeForSpeed: Schema.optional(Schema.Boolean),
 }).annotate({ identifier: "HeadlessExperimental.ScreenshotParams" });
 
 export const beginFrame = {
   method: "HeadlessExperimental.beginFrame" as const,
   params: Schema.Struct({
-    frameTimeTicks: Schema.optional(Schema.Number),
-    interval: Schema.optional(Schema.Number),
+    frameTimeTicks: Schema.optional(Schema.Finite),
+    interval: Schema.optional(Schema.Finite),
     noDisplayUpdates: Schema.optional(Schema.Boolean),
     screenshot: Schema.optional(ScreenshotParams),
   }).annotate({ identifier: "HeadlessExperimental.beginFrame.params" }),

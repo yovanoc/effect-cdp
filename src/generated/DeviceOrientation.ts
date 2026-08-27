@@ -14,9 +14,9 @@ export const clearDeviceOrientationOverride = {
 export const setDeviceOrientationOverride = {
   method: "DeviceOrientation.setDeviceOrientationOverride" as const,
   params: Schema.Struct({
-    alpha: Schema.Number,
-    beta: Schema.Number,
-    gamma: Schema.Number,
+    alpha: Schema.Finite,
+    beta: Schema.Finite,
+    gamma: Schema.Finite,
   }).annotate({
     identifier: "DeviceOrientation.setDeviceOrientationOverride.params",
   }),

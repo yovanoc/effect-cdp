@@ -2,10 +2,10 @@
 import { Schema } from "effect";
 
 export const GPUDevice = Schema.Struct({
-  vendorId: Schema.Number,
-  deviceId: Schema.Number,
-  subSysId: Schema.optional(Schema.Number),
-  revision: Schema.optional(Schema.Number),
+  vendorId: Schema.Finite,
+  deviceId: Schema.Finite,
+  subSysId: Schema.optional(Schema.Finite),
+  revision: Schema.optional(Schema.Finite),
   vendorString: Schema.String,
   deviceString: Schema.String,
   driverVendor: Schema.String,
@@ -13,8 +13,8 @@ export const GPUDevice = Schema.Struct({
 }).annotate({ identifier: "SystemInfo.GPUDevice" });
 
 export const Size = Schema.Struct({
-  width: Schema.Number,
-  height: Schema.Number,
+  width: Schema.Int,
+  height: Schema.Int,
 }).annotate({ identifier: "SystemInfo.Size" });
 
 export const VideoDecodeAcceleratorCapability = Schema.Struct({
@@ -26,8 +26,8 @@ export const VideoDecodeAcceleratorCapability = Schema.Struct({
 export const VideoEncodeAcceleratorCapability = Schema.Struct({
   profile: Schema.String,
   maxResolution: Size,
-  maxFramerateNumerator: Schema.Number,
-  maxFramerateDenominator: Schema.Number,
+  maxFramerateNumerator: Schema.Int,
+  maxFramerateDenominator: Schema.Int,
 }).annotate({ identifier: "SystemInfo.VideoEncodeAcceleratorCapability" });
 
 export const GPUInfo = Schema.Struct({
@@ -45,8 +45,8 @@ export const ImageType = Schema.Literals(["jpeg", "webp", "unknown"]).annotate({
 
 export const ProcessInfo = Schema.Struct({
   type: Schema.String,
-  id: Schema.Number,
-  cpuTime: Schema.Number,
+  id: Schema.Int,
+  cpuTime: Schema.Finite,
 }).annotate({ identifier: "SystemInfo.ProcessInfo" });
 
 export const SubsamplingFormat = Schema.Literals([

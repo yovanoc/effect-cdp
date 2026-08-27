@@ -23,8 +23,8 @@ export const CallFrame = Schema.Struct({
   functionName: Schema.String,
   scriptId: ScriptId,
   url: Schema.String,
-  lineNumber: Schema.Number,
-  columnNumber: Schema.Number,
+  lineNumber: Schema.Int,
+  columnNumber: Schema.Int,
 }).annotate({ identifier: "Runtime.CallFrame" });
 
 export const CustomPreview = Schema.Struct({
@@ -61,7 +61,7 @@ export const DeepSerializedValue = Schema.Struct({
   ]),
   value: Schema.optional(Schema.Json),
   objectId: Schema.optional(Schema.String),
-  weakLocalObjectReference: Schema.optional(Schema.Number),
+  weakLocalObjectReference: Schema.optional(Schema.Int),
 }).annotate({ identifier: "Runtime.DeepSerializedValue" });
 
 export interface RuntimeEntryPreviewType {
@@ -76,7 +76,7 @@ export const EntryPreview: Schema.Schema<RuntimeEntryPreviewType> =
     }),
   ).annotate({ identifier: "Runtime.EntryPreview" });
 
-export const ExecutionContextId = Schema.Number.annotate({
+export const ExecutionContextId = Schema.Int.annotate({
   identifier: "Runtime.ExecutionContextId",
 });
 
@@ -227,10 +227,10 @@ export const StackTrace: Schema.Schema<RuntimeStackTraceType> = Schema.suspend(
 ).annotate({ identifier: "Runtime.StackTrace" });
 
 export const ExceptionDetails = Schema.Struct({
-  exceptionId: Schema.Number,
+  exceptionId: Schema.Int,
   text: Schema.String,
-  lineNumber: Schema.Number,
-  columnNumber: Schema.Number,
+  lineNumber: Schema.Int,
+  columnNumber: Schema.Int,
   scriptId: Schema.optional(ScriptId),
   url: Schema.optional(Schema.String),
   stackTrace: Schema.optional(StackTrace),
@@ -355,7 +355,7 @@ export const PropertyPreview: Schema.Schema<RuntimePropertyPreviewType> =
 
 export const SerializationOptions = Schema.Struct({
   serialization: Schema.Literals(["deep", "json", "idOnly"]),
-  maxDepth: Schema.optional(Schema.Number),
+  maxDepth: Schema.optional(Schema.Int),
   additionalParameters: Schema.optional(Schema.Json),
 }).annotate({ identifier: "Runtime.SerializationOptions" });
 
@@ -368,11 +368,11 @@ export const StackTraceId = Schema.Struct({
   debuggerId: Schema.optional(UniqueDebuggerId),
 }).annotate({ identifier: "Runtime.StackTraceId" });
 
-export const TimeDelta = Schema.Number.annotate({
+export const TimeDelta = Schema.Finite.annotate({
   identifier: "Runtime.TimeDelta",
 });
 
-export const Timestamp = Schema.Number.annotate({
+export const Timestamp = Schema.Finite.annotate({
   identifier: "Runtime.Timestamp",
 });
 
@@ -546,10 +546,10 @@ export const getHeapUsage = {
     identifier: "Runtime.getHeapUsage.params",
   }),
   result: Schema.Struct({
-    usedSize: Schema.Number,
-    totalSize: Schema.Number,
-    embedderHeapUsedSize: Schema.Number,
-    backingStorageSize: Schema.Number,
+    usedSize: Schema.Finite,
+    totalSize: Schema.Finite,
+    embedderHeapUsedSize: Schema.Finite,
+    backingStorageSize: Schema.Finite,
   }).annotate({ identifier: "Runtime.getHeapUsage.result" }),
 } as const;
 
@@ -670,7 +670,7 @@ export const runScript = {
 export const setAsyncCallStackDepth = {
   method: "Runtime.setAsyncCallStackDepth" as const,
   params: Schema.Struct({
-    maxDepth: Schema.Number,
+    maxDepth: Schema.Int,
   }).annotate({ identifier: "Runtime.setAsyncCallStackDepth.params" }),
   result: Schema.Struct({}).annotate({
     identifier: "Runtime.setAsyncCallStackDepth.result",
@@ -692,7 +692,7 @@ export const setCustomObjectFormatterEnabled = {
 export const setMaxCallStackSizeToCapture = {
   method: "Runtime.setMaxCallStackSizeToCapture" as const,
   params: Schema.Struct({
-    size: Schema.Number,
+    size: Schema.Int,
   }).annotate({ identifier: "Runtime.setMaxCallStackSizeToCapture.params" }),
   result: Schema.Struct({}).annotate({
     identifier: "Runtime.setMaxCallStackSizeToCapture.result",
@@ -759,7 +759,7 @@ export const exceptionRevoked = {
   method: "Runtime.exceptionRevoked" as const,
   params: Schema.Struct({
     reason: Schema.String,
-    exceptionId: Schema.Number,
+    exceptionId: Schema.Int,
   }).annotate({ identifier: "Runtime.exceptionRevoked.params" }),
 } as const;
 

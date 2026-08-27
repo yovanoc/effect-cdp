@@ -26,4 +26,4 @@ it("integration test with testcontainers", async () => {
 
   const result = await Effect.runPromise(program);
   expect(Array.isArray(result)).toBe(true);
-}, 15_000);
+}, 60_000);

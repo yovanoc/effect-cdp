@@ -4,7 +4,7 @@ import * as DOM from "./DOM.js";
 import * as DOMDebugger from "./DOMDebugger.js";
 import * as Page from "./Page.js";
 
-export const StringIndex = Schema.Number.annotate({
+export const StringIndex = Schema.Int.annotate({
   identifier: "DOMSnapshot.StringIndex",
 });
 
@@ -22,40 +22,40 @@ export const ComputedStyle = Schema.Struct({
 }).annotate({ identifier: "DOMSnapshot.ComputedStyle" });
 
 export const RareBooleanData = Schema.Struct({
-  index: Schema.Array(Schema.Number),
+  index: Schema.Array(Schema.Int),
 }).annotate({ identifier: "DOMSnapshot.RareBooleanData" });
 
-export const Rectangle = Schema.Array(Schema.Number).annotate({
+export const Rectangle = Schema.Array(Schema.Finite).annotate({
   identifier: "DOMSnapshot.Rectangle",
 });
 
 export const LayoutTreeSnapshot = Schema.Struct({
-  nodeIndex: Schema.Array(Schema.Number),
+  nodeIndex: Schema.Array(Schema.Int),
   styles: Schema.Array(ArrayOfStrings),
   bounds: Schema.Array(Rectangle),
   text: Schema.Array(StringIndex),
   stackingContexts: RareBooleanData,
-  paintOrders: Schema.optional(Schema.Array(Schema.Number)),
+  paintOrders: Schema.optional(Schema.Array(Schema.Int)),
   offsetRects: Schema.optional(Schema.Array(Rectangle)),
   scrollRects: Schema.optional(Schema.Array(Rectangle)),
   clientRects: Schema.optional(Schema.Array(Rectangle)),
   blendedBackgroundColors: Schema.optional(Schema.Array(StringIndex)),
-  textColorOpacities: Schema.optional(Schema.Array(Schema.Number)),
+  textColorOpacities: Schema.optional(Schema.Array(Schema.Finite)),
 }).annotate({ identifier: "DOMSnapshot.LayoutTreeSnapshot" });
 
 export const RareIntegerData = Schema.Struct({
-  index: Schema.Array(Schema.Number),
-  value: Schema.Array(Schema.Number),
+  index: Schema.Array(Schema.Int),
+  value: Schema.Array(Schema.Int),
 }).annotate({ identifier: "DOMSnapshot.RareIntegerData" });
 
 export const RareStringData = Schema.Struct({
-  index: Schema.Array(Schema.Number),
+  index: Schema.Array(Schema.Int),
   value: Schema.Array(StringIndex),
 }).annotate({ identifier: "DOMSnapshot.RareStringData" });
 
 export const NodeTreeSnapshot = Schema.Struct({
-  parentIndex: Schema.optional(Schema.Array(Schema.Number)),
-  nodeType: Schema.optional(Schema.Array(Schema.Number)),
+  parentIndex: Schema.optional(Schema.Array(Schema.Int)),
+  nodeType: Schema.optional(Schema.Array(Schema.Int)),
   shadowRootType: Schema.optional(RareStringData),
   nodeName: Schema.optional(Schema.Array(StringIndex)),
   nodeValue: Schema.optional(Schema.Array(StringIndex)),
@@ -74,10 +74,10 @@ export const NodeTreeSnapshot = Schema.Struct({
 }).annotate({ identifier: "DOMSnapshot.NodeTreeSnapshot" });
 
 export const TextBoxSnapshot = Schema.Struct({
-  layoutIndex: Schema.Array(Schema.Number),
+  layoutIndex: Schema.Array(Schema.Int),
   bounds: Schema.Array(Rectangle),
-  start: Schema.Array(Schema.Number),
-  length: Schema.Array(Schema.Number),
+  start: Schema.Array(Schema.Int),
+  length: Schema.Array(Schema.Int),
 }).annotate({ identifier: "DOMSnapshot.TextBoxSnapshot" });
 
 export const DocumentSnapshot = Schema.Struct({
@@ -92,14 +92,14 @@ export const DocumentSnapshot = Schema.Struct({
   nodes: NodeTreeSnapshot,
   layout: LayoutTreeSnapshot,
   textBoxes: TextBoxSnapshot,
-  scrollOffsetX: Schema.optional(Schema.Number),
-  scrollOffsetY: Schema.optional(Schema.Number),
-  contentWidth: Schema.optional(Schema.Number),
-  contentHeight: Schema.optional(Schema.Number),
+  scrollOffsetX: Schema.optional(Schema.Finite),
+  scrollOffsetY: Schema.optional(Schema.Finite),
+  contentWidth: Schema.optional(Schema.Finite),
+  contentHeight: Schema.optional(Schema.Finite),
 }).annotate({ identifier: "DOMSnapshot.DocumentSnapshot" });
 
 export const DOMNode = Schema.Struct({
-  nodeType: Schema.Number,
+  nodeType: Schema.Int,
   nodeName: Schema.String,
   nodeValue: Schema.String,
   textValue: Schema.optional(Schema.String),
@@ -107,10 +107,10 @@ export const DOMNode = Schema.Struct({
   inputChecked: Schema.optional(Schema.Boolean),
   optionSelected: Schema.optional(Schema.Boolean),
   backendNodeId: DOM.BackendNodeId,
-  childNodeIndexes: Schema.optional(Schema.Array(Schema.Number)),
+  childNodeIndexes: Schema.optional(Schema.Array(Schema.Int)),
   attributes: Schema.optional(Schema.Array(NameValue)),
-  pseudoElementIndexes: Schema.optional(Schema.Array(Schema.Number)),
-  layoutNodeIndex: Schema.optional(Schema.Number),
+  pseudoElementIndexes: Schema.optional(Schema.Array(Schema.Int)),
+  layoutNodeIndex: Schema.optional(Schema.Int),
   documentURL: Schema.optional(Schema.String),
   baseURL: Schema.optional(Schema.String),
   contentLanguage: Schema.optional(Schema.String),
@@ -118,30 +118,30 @@ export const DOMNode = Schema.Struct({
   publicId: Schema.optional(Schema.String),
   systemId: Schema.optional(Schema.String),
   frameId: Schema.optional(Page.FrameId),
-  contentDocumentIndex: Schema.optional(Schema.Number),
+  contentDocumentIndex: Schema.optional(Schema.Int),
   pseudoType: Schema.optional(DOM.PseudoType),
   shadowRootType: Schema.optional(DOM.ShadowRootType),
   isClickable: Schema.optional(Schema.Boolean),
   eventListeners: Schema.optional(Schema.Array(DOMDebugger.EventListener)),
   currentSourceURL: Schema.optional(Schema.String),
   originURL: Schema.optional(Schema.String),
-  scrollOffsetX: Schema.optional(Schema.Number),
-  scrollOffsetY: Schema.optional(Schema.Number),
+  scrollOffsetX: Schema.optional(Schema.Finite),
+  scrollOffsetY: Schema.optional(Schema.Finite),
 }).annotate({ identifier: "DOMSnapshot.DOMNode" });
 
 export const InlineTextBox = Schema.Struct({
   boundingBox: DOM.Rect,
-  startCharacterIndex: Schema.Number,
-  numCharacters: Schema.Number,
+  startCharacterIndex: Schema.Int,
+  numCharacters: Schema.Int,
 }).annotate({ identifier: "DOMSnapshot.InlineTextBox" });
 
 export const LayoutTreeNode = Schema.Struct({
-  domNodeIndex: Schema.Number,
+  domNodeIndex: Schema.Int,
   boundingBox: DOM.Rect,
   layoutText: Schema.optional(Schema.String),
   inlineTextNodes: Schema.optional(Schema.Array(InlineTextBox)),
-  styleIndex: Schema.optional(Schema.Number),
-  paintOrder: Schema.optional(Schema.Number),
+  styleIndex: Schema.optional(Schema.Int),
+  paintOrder: Schema.optional(Schema.Int),
   isStackingContext: Schema.optional(Schema.Boolean),
 }).annotate({ identifier: "DOMSnapshot.LayoutTreeNode" });
 

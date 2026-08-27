@@ -4,7 +4,7 @@ import { Schema } from "effect";
 export const bind = {
   method: "Tethering.bind" as const,
   params: Schema.Struct({
-    port: Schema.Number,
+    port: Schema.Int,
   }).annotate({ identifier: "Tethering.bind.params" }),
   result: Schema.Struct({}).annotate({ identifier: "Tethering.bind.result" }),
 } as const;
@@ -12,7 +12,7 @@ export const bind = {
 export const unbind = {
   method: "Tethering.unbind" as const,
   params: Schema.Struct({
-    port: Schema.Number,
+    port: Schema.Int,
   }).annotate({ identifier: "Tethering.unbind.params" }),
   result: Schema.Struct({}).annotate({ identifier: "Tethering.unbind.result" }),
 } as const;
@@ -20,7 +20,7 @@ export const unbind = {
 export const accepted = {
   method: "Tethering.accepted" as const,
   params: Schema.Struct({
-    port: Schema.Number,
+    port: Schema.Int,
     connectionId: Schema.String,
   }).annotate({ identifier: "Tethering.accepted.params" }),
 } as const;

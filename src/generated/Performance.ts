@@ -3,7 +3,7 @@ import { Schema } from "effect";
 
 export const Metric = Schema.Struct({
   name: Schema.String,
-  value: Schema.Number,
+  value: Schema.Finite,
 }).annotate({ identifier: "Performance.Metric" });
 
 export const disable = {

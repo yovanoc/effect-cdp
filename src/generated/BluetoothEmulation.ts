@@ -42,21 +42,21 @@ export const GATTOperationType = Schema.Literals([
 ]).annotate({ identifier: "BluetoothEmulation.GATTOperationType" });
 
 export const ManufacturerData = Schema.Struct({
-  key: Schema.Number,
+  key: Schema.Int,
   data: Schema.String,
 }).annotate({ identifier: "BluetoothEmulation.ManufacturerData" });
 
 export const ScanRecord = Schema.Struct({
   name: Schema.optional(Schema.String),
   uuids: Schema.optional(Schema.Array(Schema.String)),
-  appearance: Schema.optional(Schema.Number),
-  txPower: Schema.optional(Schema.Number),
+  appearance: Schema.optional(Schema.Int),
+  txPower: Schema.optional(Schema.Int),
   manufacturerData: Schema.optional(Schema.Array(ManufacturerData)),
 }).annotate({ identifier: "BluetoothEmulation.ScanRecord" });
 
 export const ScanEntry = Schema.Struct({
   deviceAddress: Schema.String,
-  rssi: Schema.Number,
+  rssi: Schema.Int,
   scanRecord: ScanRecord,
 }).annotate({ identifier: "BluetoothEmulation.ScanEntry" });
 
@@ -174,7 +174,7 @@ export const simulateCharacteristicOperationResponse = {
   params: Schema.Struct({
     characteristicId: Schema.String,
     type: CharacteristicOperationType,
-    code: Schema.Number,
+    code: Schema.Int,
     data: Schema.optional(Schema.String),
   }).annotate({
     identifier:
@@ -191,7 +191,7 @@ export const simulateDescriptorOperationResponse = {
   params: Schema.Struct({
     descriptorId: Schema.String,
     type: DescriptorOperationType,
-    code: Schema.Number,
+    code: Schema.Int,
     data: Schema.optional(Schema.String),
   }).annotate({
     identifier: "BluetoothEmulation.simulateDescriptorOperationResponse.params",
@@ -218,7 +218,7 @@ export const simulateGATTOperationResponse = {
   params: Schema.Struct({
     address: Schema.String,
     type: GATTOperationType,
-    code: Schema.Number,
+    code: Schema.Int,
   }).annotate({
     identifier: "BluetoothEmulation.simulateGATTOperationResponse.params",
   }),

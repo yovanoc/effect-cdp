@@ -41,7 +41,10 @@ const CdpTargetInfoArray = Schema.Array(CdpTargetInfo).annotate({
 });
 
 const deriveHttpBase = (webSocketDebuggerUrl: string): string => {
-  const url = new URL(webSocketDebuggerUrl);
+  const url = URL.parse(webSocketDebuggerUrl);
+  if (url === null) {
+    return webSocketDebuggerUrl;
+  }
   const protocol = url.protocol === "wss:" ? "https:" : "http:";
   return `${protocol}//${url.host}`;
 };
@@ -49,11 +52,8 @@ const deriveHttpBase = (webSocketDebuggerUrl: string): string => {
 export class HttpDiscovery extends Context.Service<
   HttpDiscovery,
   {
-    readonly version: () => Effect.Effect<CdpVersionInfo, CdpDecodeError>;
-    readonly list: () => Effect.Effect<
-      ReadonlyArray<CdpTargetInfo>,
-      CdpDecodeError
-    >;
+    readonly version: Effect.Effect<CdpVersionInfo, CdpDecodeError>;
+    readonly list: Effect.Effect<ReadonlyArray<CdpTargetInfo>, CdpDecodeError>;
     readonly newTab: (
       url?: string,
     ) => Effect.Effect<CdpTargetInfo, CdpDecodeError>;
@@ -72,19 +72,20 @@ export class HttpDiscovery extends Context.Service<
         response: HttpClientResponse.HttpClientResponse,
       ): Effect.Effect<S["Type"], CdpDecodeError, S["DecodingServices"]> =>
         HttpClientResponse.schemaBodyJson(schema)(response).pipe(
-          Effect.catchTag("SchemaError", (error) =>
-            response.text.pipe(
-              Effect.catch(() => Effect.succeed("")),
-              Effect.flatMap(
-                (raw) =>
-                  new CdpDecodeError({
-                    raw,
-                    parseError: Cause.pretty(Cause.fail(error)),
-                  }),
+          Effect.catchTags({
+            SchemaError: (error) =>
+              response.text.pipe(
+                Effect.orElseSucceed(() => ""),
+                Effect.flatMap(
+                  (raw) =>
+                    new CdpDecodeError({
+                      raw,
+                      parseError: Cause.pretty(Cause.fail(error)),
+                    }),
+                ),
               ),
-            ),
-          ),
-          Effect.catchTag("HttpClientError", (error) => Effect.die(error)),
+            HttpClientError: Effect.die,
+          }),
         );
 
       const version = Effect.fn("HttpDiscovery.version")(function* () {
@@ -123,8 +124,8 @@ export class HttpDiscovery extends Context.Service<
       });
 
       return HttpDiscovery.of({
-        version: () => version(),
-        list: () => list(),
+        version: version(),
+        list: list(),
         newTab: (url?: string) => newTab(url),
         close: (targetId: TargetId) => close(targetId),
       });

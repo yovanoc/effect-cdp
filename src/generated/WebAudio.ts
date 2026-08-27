@@ -29,9 +29,9 @@ export const AudioNode = Schema.Struct({
   nodeId: GraphObjectId,
   contextId: GraphObjectId,
   nodeType: NodeType,
-  numberOfInputs: Schema.Number,
-  numberOfOutputs: Schema.Number,
-  channelCount: Schema.Number,
+  numberOfInputs: Schema.Finite,
+  numberOfOutputs: Schema.Finite,
+  channelCount: Schema.Finite,
   channelCountMode: ChannelCountMode,
   channelInterpretation: ChannelInterpretation,
 }).annotate({ identifier: "WebAudio.AudioNode" });
@@ -50,16 +50,16 @@ export const AudioParam = Schema.Struct({
   contextId: GraphObjectId,
   paramType: ParamType,
   rate: AutomationRate,
-  defaultValue: Schema.Number,
-  minValue: Schema.Number,
-  maxValue: Schema.Number,
+  defaultValue: Schema.Finite,
+  minValue: Schema.Finite,
+  maxValue: Schema.Finite,
 }).annotate({ identifier: "WebAudio.AudioParam" });
 
 export const ContextRealtimeData = Schema.Struct({
-  currentTime: Schema.Number,
-  renderCapacity: Schema.Number,
-  callbackIntervalMean: Schema.Number,
-  callbackIntervalVariance: Schema.Number,
+  currentTime: Schema.Finite,
+  renderCapacity: Schema.Finite,
+  callbackIntervalMean: Schema.Finite,
+  callbackIntervalVariance: Schema.Finite,
 }).annotate({ identifier: "WebAudio.ContextRealtimeData" });
 
 export const ContextState = Schema.Literals([
@@ -78,9 +78,10 @@ export const BaseAudioContext = Schema.Struct({
   contextType: ContextType,
   contextState: ContextState,
   realtimeData: Schema.optional(ContextRealtimeData),
-  callbackBufferSize: Schema.Number,
-  maxOutputChannelCount: Schema.Number,
-  sampleRate: Schema.Number,
+  callbackBufferSize: Schema.Finite,
+  maxOutputChannelCount: Schema.Finite,
+  sampleRate: Schema.Finite,
+  renderQuantumSize: Schema.Finite,
 }).annotate({ identifier: "WebAudio.BaseAudioContext" });
 
 export const disable = {
@@ -178,7 +179,7 @@ export const nodeParamConnected = {
     contextId: GraphObjectId,
     sourceId: GraphObjectId,
     destinationId: GraphObjectId,
-    sourceOutputIndex: Schema.optional(Schema.Number),
+    sourceOutputIndex: Schema.optional(Schema.Finite),
   }).annotate({ identifier: "WebAudio.nodeParamConnected.params" }),
 } as const;
 
@@ -188,7 +189,7 @@ export const nodeParamDisconnected = {
     contextId: GraphObjectId,
     sourceId: GraphObjectId,
     destinationId: GraphObjectId,
-    sourceOutputIndex: Schema.optional(Schema.Number),
+    sourceOutputIndex: Schema.optional(Schema.Finite),
   }).annotate({ identifier: "WebAudio.nodeParamDisconnected.params" }),
 } as const;
 
@@ -198,8 +199,8 @@ export const nodesConnected = {
     contextId: GraphObjectId,
     sourceId: GraphObjectId,
     destinationId: GraphObjectId,
-    sourceOutputIndex: Schema.optional(Schema.Number),
-    destinationInputIndex: Schema.optional(Schema.Number),
+    sourceOutputIndex: Schema.optional(Schema.Finite),
+    destinationInputIndex: Schema.optional(Schema.Finite),
   }).annotate({ identifier: "WebAudio.nodesConnected.params" }),
 } as const;
 
@@ -209,7 +210,7 @@ export const nodesDisconnected = {
     contextId: GraphObjectId,
     sourceId: GraphObjectId,
     destinationId: GraphObjectId,
-    sourceOutputIndex: Schema.optional(Schema.Number),
-    destinationInputIndex: Schema.optional(Schema.Number),
+    sourceOutputIndex: Schema.optional(Schema.Finite),
+    destinationInputIndex: Schema.optional(Schema.Finite),
   }).annotate({ identifier: "WebAudio.nodesDisconnected.params" }),
 } as const;

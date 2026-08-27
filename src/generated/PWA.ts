@@ -35,7 +35,7 @@ export const getOsAppState = {
     manifestId: Schema.String,
   }).annotate({ identifier: "PWA.getOsAppState.params" }),
   result: Schema.Struct({
-    badgeCount: Schema.Number,
+    badgeCount: Schema.Int,
     fileHandlers: Schema.Array(FileHandler),
   }).annotate({ identifier: "PWA.getOsAppState.result" }),
 } as const;

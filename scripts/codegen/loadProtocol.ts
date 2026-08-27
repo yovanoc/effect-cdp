@@ -222,11 +222,15 @@ const readDomain = (record: Readonly<Record<string, unknown>>): Domain => {
 
 const readProtocolFile = (fileName: string): Protocol => {
   const raw = readFileSync(join(protocolDirectory, fileName), "utf-8");
-  const parsed: unknown = JSON.parse(raw);
-  if (!isRecord(parsed)) {
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(raw);
+  } catch {
     return { domains: [] };
   }
-  return { domains: readArray(parsed, "domains", readDomain) };
+  return isRecord(parsed)
+    ? { domains: readArray(parsed, "domains", readDomain) }
+    : { domains: [] };
 };
 
 const mergeDomains = (

@@ -3,14 +3,14 @@ import { Schema } from "effect";
 
 export const DOMCounter = Schema.Struct({
   name: Schema.String,
-  count: Schema.Number,
+  count: Schema.Int,
 }).annotate({ identifier: "Memory.DOMCounter" });
 
 export const Module = Schema.Struct({
   name: Schema.String,
   uuid: Schema.String,
   baseAddress: Schema.String,
-  size: Schema.Number,
+  size: Schema.Finite,
 }).annotate({ identifier: "Memory.Module" });
 
 export const PressureLevel = Schema.Literals(["moderate", "critical"]).annotate(
@@ -18,8 +18,8 @@ export const PressureLevel = Schema.Literals(["moderate", "critical"]).annotate(
 );
 
 export const SamplingProfileNode = Schema.Struct({
-  size: Schema.Number,
-  total: Schema.Number,
+  size: Schema.Finite,
+  total: Schema.Finite,
   stack: Schema.Array(Schema.String),
 }).annotate({ identifier: "Memory.SamplingProfileNode" });
 
@@ -64,9 +64,9 @@ export const getDOMCounters = {
     identifier: "Memory.getDOMCounters.params",
   }),
   result: Schema.Struct({
-    documents: Schema.Number,
-    nodes: Schema.Number,
-    jsEventListeners: Schema.Number,
+    documents: Schema.Int,
+    nodes: Schema.Int,
+    jsEventListeners: Schema.Int,
   }).annotate({ identifier: "Memory.getDOMCounters.result" }),
 } as const;
 
@@ -125,7 +125,7 @@ export const simulatePressureNotification = {
 export const startSampling = {
   method: "Memory.startSampling" as const,
   params: Schema.Struct({
-    samplingInterval: Schema.optional(Schema.Number),
+    samplingInterval: Schema.optional(Schema.Int),
     suppressRandomness: Schema.optional(Schema.Boolean),
   }).annotate({ identifier: "Memory.startSampling.params" }),
   result: Schema.Struct({}).annotate({

@@ -29,7 +29,7 @@ export const TraceConfig = Schema.Struct({
       "echoToConsole",
     ]),
   ),
-  traceBufferSizeInKb: Schema.optional(Schema.Number),
+  traceBufferSizeInKb: Schema.optional(Schema.Finite),
   enableSampling: Schema.optional(Schema.Boolean),
   enableSystrace: Schema.optional(Schema.Boolean),
   enableArgumentFilter: Schema.optional(Schema.Boolean),
@@ -105,7 +105,7 @@ export const start = {
     /** @deprecated @experimental Tracing options */
     options: Schema.optional(Schema.String),
     /** @experimental If set, the agent will issue bufferUsage events at this interval, specified in milliseconds */
-    bufferUsageReportingInterval: Schema.optional(Schema.Number),
+    bufferUsageReportingInterval: Schema.optional(Schema.Finite),
     transferMode: Schema.optional(
       Schema.Literals(["ReportEvents", "ReturnAsStream"]),
     ),
@@ -120,6 +120,17 @@ export const start = {
     perfettoConfig: Schema.optional(Schema.String),
     /** @experimental Backend type (defaults to `auto`) */
     tracingBackend: Schema.optional(TracingBackend),
+    /** @experimental Maximum width and height (in pixels) of each captured screenshot.
+    Only used when the `disabled-by-default-devtools.screenshot` category is
+    enabled. Defaults to 500. The combined memory footprint of screenshots
+    (`screenshotMaxSize` * `screenshotMaxSize` * 4 * `screenshotMaxCount`)
+    is clamped to the existing per-session budget. */
+    screenshotMaxSize: Schema.optional(Schema.Int),
+    /** @experimental Maximum number of screenshots captured during a single tracing session.
+    Only used when the `disabled-by-default-devtools.screenshot` category is
+    enabled. Defaults to 450. Clamped together with `screenshotMaxSize` to
+    stay within the per-session screenshot memory budget. */
+    screenshotMaxCount: Schema.optional(Schema.Int),
   }).annotate({ identifier: "Tracing.start.params" }),
   result: Schema.Struct({}).annotate({ identifier: "Tracing.start.result" }),
 } as const;
@@ -128,9 +139,9 @@ export const start = {
 export const bufferUsage = {
   method: "Tracing.bufferUsage" as const,
   params: Schema.Struct({
-    percentFull: Schema.optional(Schema.Number),
-    eventCount: Schema.optional(Schema.Number),
-    value: Schema.optional(Schema.Number),
+    percentFull: Schema.optional(Schema.Finite),
+    eventCount: Schema.optional(Schema.Finite),
+    value: Schema.optional(Schema.Finite),
   }).annotate({ identifier: "Tracing.bufferUsage.params" }),
 } as const;
 

@@ -7,6 +7,7 @@ import * as Runtime from "./Runtime.js";
 export const Annotation = Schema.Struct({
   readOnly: Schema.optional(Schema.Boolean),
   untrustedContent: Schema.optional(Schema.Boolean),
+  consequential: Schema.optional(Schema.Boolean),
   autosubmit: Schema.optional(Schema.Boolean),
 }).annotate({ identifier: "WebMCP.Annotation" });
 

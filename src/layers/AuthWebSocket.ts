@@ -4,11 +4,12 @@ import { Cdp } from "../Cdp.js";
 import { CdpConfig } from "../CdpConfig.js";
 import { CdpConnection } from "../CdpConnection.js";
 
-class WsImportFailed extends Schema.TaggedErrorClass<WsImportFailed>(
+class WsImportFailed extends Schema.TaggedError<WsImportFailed>()(
   "WsImportFailed",
-)("WsImportFailed", {
-  reason: Schema.String,
-}) {}
+  {
+    reason: Schema.String,
+  },
+) {}
 
 /**
  * Creates a CDP layer that connects with custom WebSocket headers.
@@ -48,19 +49,22 @@ const makeWsConstructorLayer = (
               `Failed to import "ws". Install it: bun add ws. ` +
               `Original error: ${String(e)}`,
           }),
-      }).pipe(Effect.orDie);
+      }).pipe(Effect.catchTag("WsImportFailed", Effect.die));
       const WS = wsModule.default ?? wsModule.WebSocket ?? wsModule;
-      return (url: string, _protocols?: string | Array<string>) =>
-        new WS(url, { headers }) as unknown as globalThis.WebSocket;
+      return (url: string, _protocols?: string | Array<string>) => {
+        // SAFETY: `ws` implements the WebSocket surface consumed by Effect's socket bridge.
+        return new WS(url, { headers }) as unknown as globalThis.WebSocket;
+      };
     }),
   );
 
-class WebSocketUpgradeFailed extends Schema.TaggedErrorClass<WebSocketUpgradeFailed>(
+class WebSocketUpgradeFailed extends Schema.TaggedError<WebSocketUpgradeFailed>()(
   "WebSocketUpgradeFailed",
-)("WebSocketUpgradeFailed", {
-  status: Schema.Number,
-  body: Schema.String,
-}) {}
+  {
+    status: Schema.Int,
+    body: Schema.String,
+  },
+) {}
 
 const generateWebSocketKey = Effect.fnUntraced(function* () {
   const bytes = yield* Effect.all(
@@ -98,6 +102,7 @@ const fetchCloudflareWebSocket = Effect.fnUntraced(function* (
     });
   }
 
+  // SAFETY: Cloudflare's 101 response carries a non-standard `webSocket` property.
   const ws = (response as unknown as { webSocket?: WebSocket }).webSocket;
 
   if (!ws) {
@@ -107,6 +112,7 @@ const fetchCloudflareWebSocket = Effect.fnUntraced(function* (
     });
   }
 
+  // SAFETY: Cloudflare's WebSocket exposes `accept` on upgraded responses.
   (ws as unknown as { accept(): void }).accept();
 
   return ws;
@@ -120,7 +126,10 @@ const makeCloudflareSocket = (
     Effect.sync(() => ws.close(1000, "cleanup")),
   ).pipe(
     Effect.flatMap((ws) => Socket.fromWebSocket(Effect.succeed(ws))),
-    Effect.orDie,
+    Effect.catchTags({
+      SocketOpenError: Effect.die,
+      WebSocketUpgradeFailed: Effect.die,
+    }),
   );
 
 /**

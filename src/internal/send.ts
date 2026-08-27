@@ -16,7 +16,9 @@ type SendError =
   | CdpProtocolError
   | CdpDecodeError;
 
-const encodeFrame = Schema.encodeUnknownSync(Schema.UnknownFromJsonString);
+const encodeFrame = Schema.encodeUnknownSync(
+  Schema.fromJsonString(Schema.Json),
+);
 
 const timeoutError = (
   method: string,
@@ -49,7 +51,7 @@ export const send = Effect.fnUntraced(function* (
     readonly timeout?: Duration.Duration;
   },
 ): Effect.fn.Return<unknown, SendError> {
-  const id = yield* pending.nextId();
+  const id = yield* pending.nextId;
   const sessionId = shouldRouteFromRoot(method, params)
     ? undefined
     : opts.sessionId;

@@ -62,15 +62,15 @@ export const Cookie = Schema.Struct({
   value: Schema.String,
   domain: Schema.String,
   path: Schema.String,
-  expires: Schema.Number,
-  size: Schema.Number,
+  expires: Schema.Finite,
+  size: Schema.Int,
   httpOnly: Schema.Boolean,
   secure: Schema.Boolean,
   session: Schema.Boolean,
   sameSite: Schema.optional(CookieSameSite),
   priority: CookiePriority,
   sourceScheme: CookieSourceScheme,
-  sourcePort: Schema.Number,
+  sourcePort: Schema.Int,
   partitionKey: Schema.optional(CookiePartitionKey),
   partitionKeyOpaque: Schema.optional(Schema.Boolean),
 }).annotate({ identifier: "Network.Cookie" });
@@ -99,10 +99,6 @@ export const CookieBlockedReason = Schema.Literals([
 export const CookieExemptionReason = Schema.Literals([
   "None",
   "UserSetting",
-  "TPCDMetadata",
-  "TPCDDeprecationTrial",
-  "TopLevelTPCDDeprecationTrial",
-  "TPCDHeuristics",
   "EnterprisePolicy",
   "StorageAccess",
   "TopLevelStorageAccess",
@@ -207,27 +203,27 @@ export const ResourceType = Schema.Literals([
 export const Headers = Schema.Json.annotate({ identifier: "Network.Headers" });
 
 export const ResourceTiming = Schema.Struct({
-  requestTime: Schema.Number,
-  proxyStart: Schema.Number,
-  proxyEnd: Schema.Number,
-  dnsStart: Schema.Number,
-  dnsEnd: Schema.Number,
-  connectStart: Schema.Number,
-  connectEnd: Schema.Number,
-  sslStart: Schema.Number,
-  sslEnd: Schema.Number,
-  workerStart: Schema.Number,
-  workerReady: Schema.Number,
-  workerFetchStart: Schema.Number,
-  workerRespondWithSettled: Schema.Number,
-  workerRouterEvaluationStart: Schema.optional(Schema.Number),
-  workerCacheLookupStart: Schema.optional(Schema.Number),
-  sendStart: Schema.Number,
-  sendEnd: Schema.Number,
-  pushStart: Schema.Number,
-  pushEnd: Schema.Number,
-  receiveHeadersStart: Schema.Number,
-  receiveHeadersEnd: Schema.Number,
+  requestTime: Schema.Finite,
+  proxyStart: Schema.Finite,
+  proxyEnd: Schema.Finite,
+  dnsStart: Schema.Finite,
+  dnsEnd: Schema.Finite,
+  connectStart: Schema.Finite,
+  connectEnd: Schema.Finite,
+  sslStart: Schema.Finite,
+  sslEnd: Schema.Finite,
+  workerStart: Schema.Finite,
+  workerReady: Schema.Finite,
+  workerFetchStart: Schema.Finite,
+  workerRespondWithSettled: Schema.Finite,
+  workerRouterEvaluationStart: Schema.optional(Schema.Finite),
+  workerCacheLookupStart: Schema.optional(Schema.Finite),
+  sendStart: Schema.Finite,
+  sendEnd: Schema.Finite,
+  pushStart: Schema.Finite,
+  pushEnd: Schema.Finite,
+  receiveHeadersStart: Schema.Finite,
+  receiveHeadersEnd: Schema.Finite,
 }).annotate({ identifier: "Network.ResourceTiming" });
 
 export const CertificateTransparencyCompliance = Schema.Literals([
@@ -241,13 +237,13 @@ export const SignedCertificateTimestamp = Schema.Struct({
   origin: Schema.String,
   logDescription: Schema.String,
   logId: Schema.String,
-  timestamp: Schema.Number,
+  timestamp: Schema.Finite,
   hashAlgorithm: Schema.String,
   signatureAlgorithm: Schema.String,
   signatureData: Schema.String,
 }).annotate({ identifier: "Network.SignedCertificateTimestamp" });
 
-export const TimeSinceEpoch = Schema.Number.annotate({
+export const TimeSinceEpoch = Schema.Finite.annotate({
   identifier: "Network.TimeSinceEpoch",
 });
 
@@ -265,7 +261,7 @@ export const SecurityDetails = Schema.Struct({
   validTo: TimeSinceEpoch,
   signedCertificateTimestampList: Schema.Array(SignedCertificateTimestamp),
   certificateTransparencyCompliance: CertificateTransparencyCompliance,
-  serverSignatureAlgorithm: Schema.optional(Schema.Number),
+  serverSignatureAlgorithm: Schema.optional(Schema.Int),
   encryptedClientHello: Schema.Boolean,
 }).annotate({ identifier: "Network.SecurityDetails" });
 
@@ -285,14 +281,14 @@ export const ServiceWorkerRouterSource = Schema.Literals([
 ]).annotate({ identifier: "Network.ServiceWorkerRouterSource" });
 
 export const ServiceWorkerRouterInfo = Schema.Struct({
-  ruleIdMatched: Schema.optional(Schema.Number),
+  ruleIdMatched: Schema.optional(Schema.Int),
   matchedSourceType: Schema.optional(ServiceWorkerRouterSource),
   actualSourceType: Schema.optional(ServiceWorkerRouterSource),
 }).annotate({ identifier: "Network.ServiceWorkerRouterInfo" });
 
 export const Response = Schema.Struct({
   url: Schema.String,
-  status: Schema.Number,
+  status: Schema.Int,
   statusText: Schema.String,
   headers: Headers,
   headersText: Schema.optional(Schema.String),
@@ -301,15 +297,15 @@ export const Response = Schema.Struct({
   requestHeaders: Schema.optional(Headers),
   requestHeadersText: Schema.optional(Schema.String),
   connectionReused: Schema.Boolean,
-  connectionId: Schema.Number,
+  connectionId: Schema.Finite,
   remoteIPAddress: Schema.optional(Schema.String),
-  remotePort: Schema.optional(Schema.Number),
+  remotePort: Schema.optional(Schema.Int),
   fromDiskCache: Schema.optional(Schema.Boolean),
   fromServiceWorker: Schema.optional(Schema.Boolean),
   fromPrefetchCache: Schema.optional(Schema.Boolean),
   fromEarlyHints: Schema.optional(Schema.Boolean),
   serviceWorkerRouterInfo: Schema.optional(ServiceWorkerRouterInfo),
-  encodedDataLength: Schema.Number,
+  encodedDataLength: Schema.Finite,
   timing: Schema.optional(ResourceTiming),
   serviceWorkerResponseSource: Schema.optional(ServiceWorkerResponseSource),
   responseTime: Schema.optional(TimeSinceEpoch),
@@ -324,7 +320,7 @@ export const CachedResource = Schema.Struct({
   url: Schema.String,
   type: ResourceType,
   response: Schema.optional(Response),
-  bodySize: Schema.Number,
+  bodySize: Schema.Finite,
 }).annotate({ identifier: "Network.CachedResource" });
 
 export const ChallengeEventDetails = Schema.Struct({
@@ -371,15 +367,8 @@ export const ConnectionType = Schema.Literals([
 ]).annotate({ identifier: "Network.ConnectionType" });
 
 export const ConnectTiming = Schema.Struct({
-  requestTime: Schema.Number,
+  requestTime: Schema.Finite,
 }).annotate({ identifier: "Network.ConnectTiming" });
-
-export const ContentEncoding = Schema.Literals([
-  "deflate",
-  "gzip",
-  "br",
-  "zstd",
-]).annotate({ identifier: "Network.ContentEncoding" });
 
 export const ContentSecurityPolicySource = Schema.Literals([
   "HTTP",
@@ -404,7 +393,7 @@ export const CookieParam = Schema.Struct({
   expires: Schema.optional(TimeSinceEpoch),
   priority: Schema.optional(CookiePriority),
   sourceScheme: Schema.optional(CookieSourceScheme),
-  sourcePort: Schema.optional(Schema.Number),
+  sourcePort: Schema.optional(Schema.Int),
   partitionKey: Schema.optional(CookiePartitionKey),
 }).annotate({ identifier: "Network.CookieParam" });
 
@@ -483,13 +472,14 @@ export const DeviceBoundSession = Schema.Struct({
 export const DeviceBoundSessionFailedRequest = Schema.Struct({
   requestUrl: Schema.String,
   netError: Schema.optional(Schema.String),
-  responseError: Schema.optional(Schema.Number),
+  responseError: Schema.optional(Schema.Int),
   responseErrorBody: Schema.optional(Schema.String),
 }).annotate({ identifier: "Network.DeviceBoundSessionFailedRequest" });
 
 export const DeviceBoundSessionFetchResult = Schema.Literals([
   "Success",
-  "KeyError",
+  "SigningKeyGenerationError",
+  "AttestationKeyGenerationError",
   "SigningError",
   "TransientSigningError",
   "ServerRequestedTermination",
@@ -557,6 +547,12 @@ export const DeviceBoundSessionFetchResult = Schema.Literals([
   "InvalidFederatedSessionProviderFailedToRestoreKey",
   "FailedToUnwrapKey",
   "SessionDeletedDuringRefresh",
+  "CrossOriginRegistrationSiteNotIncluded",
+  "InvalidPreProvisionedKeyInitiatorMissing",
+  "PreProvisionedKeyAccessNotGranted",
+  "PreProvisionedKeyNotFound",
+  "AttestationCertificationError",
+  "AttestationSigningError",
 ]).annotate({ identifier: "Network.DeviceBoundSessionFetchResult" });
 
 export const CreationEventDetails = Schema.Struct({
@@ -618,28 +614,28 @@ export const DirectSocketDnsQueryType = Schema.Literals([
 
 export const DirectTCPSocketOptions = Schema.Struct({
   noDelay: Schema.Boolean,
-  keepAliveDelay: Schema.optional(Schema.Number),
-  sendBufferSize: Schema.optional(Schema.Number),
-  receiveBufferSize: Schema.optional(Schema.Number),
+  keepAliveDelay: Schema.optional(Schema.Finite),
+  sendBufferSize: Schema.optional(Schema.Finite),
+  receiveBufferSize: Schema.optional(Schema.Finite),
   dnsQueryType: Schema.optional(DirectSocketDnsQueryType),
 }).annotate({ identifier: "Network.DirectTCPSocketOptions" });
 
 export const DirectUDPMessage = Schema.Struct({
   data: Schema.String,
   remoteAddr: Schema.optional(Schema.String),
-  remotePort: Schema.optional(Schema.Number),
+  remotePort: Schema.optional(Schema.Int),
 }).annotate({ identifier: "Network.DirectUDPMessage" });
 
 export const DirectUDPSocketOptions = Schema.Struct({
   remoteAddr: Schema.optional(Schema.String),
-  remotePort: Schema.optional(Schema.Number),
+  remotePort: Schema.optional(Schema.Int),
   localAddr: Schema.optional(Schema.String),
-  localPort: Schema.optional(Schema.Number),
+  localPort: Schema.optional(Schema.Int),
   dnsQueryType: Schema.optional(DirectSocketDnsQueryType),
-  sendBufferSize: Schema.optional(Schema.Number),
-  receiveBufferSize: Schema.optional(Schema.Number),
+  sendBufferSize: Schema.optional(Schema.Finite),
+  receiveBufferSize: Schema.optional(Schema.Finite),
   multicastLoopback: Schema.optional(Schema.Boolean),
-  multicastTimeToLive: Schema.optional(Schema.Number),
+  multicastTimeToLive: Schema.optional(Schema.Int),
   multicastAllowAddressSharing: Schema.optional(Schema.Boolean),
 }).annotate({ identifier: "Network.DirectUDPSocketOptions" });
 
@@ -682,19 +678,10 @@ export const Initiator = Schema.Struct({
   ]),
   stack: Schema.optional(Runtime.StackTrace),
   url: Schema.optional(Schema.String),
-  lineNumber: Schema.optional(Schema.Number),
-  columnNumber: Schema.optional(Schema.Number),
+  lineNumber: Schema.optional(Schema.Finite),
+  columnNumber: Schema.optional(Schema.Finite),
   requestId: Schema.optional(RequestId),
 }).annotate({ identifier: "Network.Initiator" });
-
-export const InterceptionId = Schema.String.annotate({
-  identifier: "Network.InterceptionId",
-});
-
-export const InterceptionStage = Schema.Literals([
-  "Request",
-  "HeadersReceived",
-]).annotate({ identifier: "Network.InterceptionStage" });
 
 export const LoaderId = Schema.String.annotate({
   identifier: "Network.LoaderId",
@@ -707,25 +694,25 @@ export const LoadNetworkResourceOptions = Schema.Struct({
 
 export const LoadNetworkResourcePageResult = Schema.Struct({
   success: Schema.Boolean,
-  netError: Schema.optional(Schema.Number),
+  netError: Schema.optional(Schema.Finite),
   netErrorName: Schema.optional(Schema.String),
-  httpStatusCode: Schema.optional(Schema.Number),
+  httpStatusCode: Schema.optional(Schema.Finite),
   stream: Schema.optional(IO.StreamHandle),
   headers: Schema.optional(Headers),
 }).annotate({ identifier: "Network.LoadNetworkResourcePageResult" });
 
-export const MonotonicTime = Schema.Number.annotate({
+export const MonotonicTime = Schema.Finite.annotate({
   identifier: "Network.MonotonicTime",
 });
 
 export const NetworkConditions = Schema.Struct({
   urlPattern: Schema.String,
-  latency: Schema.Number,
-  downloadThroughput: Schema.Number,
-  uploadThroughput: Schema.Number,
+  latency: Schema.Finite,
+  downloadThroughput: Schema.Finite,
+  uploadThroughput: Schema.Finite,
   connectionType: Schema.optional(ConnectionType),
-  packetLoss: Schema.optional(Schema.Number),
-  packetQueueLength: Schema.optional(Schema.Number),
+  packetLoss: Schema.optional(Schema.Finite),
+  packetQueueLength: Schema.optional(Schema.Int),
   packetReordering: Schema.optional(Schema.Boolean),
   offline: Schema.optional(Schema.Boolean),
 }).annotate({ identifier: "Network.NetworkConditions" });
@@ -740,11 +727,11 @@ export const RefreshEventDetails = Schema.Struct({
     "InitializedService",
     "Unreachable",
     "ServerError",
-    "RefreshQuotaExceeded",
     "FatalError",
     "SigningQuotaExceeded",
     "RefreshedAsWaiter",
     "TransientSigningError",
+    "InScopeRefreshNotYetNeeded",
   ]),
   fetchResult: Schema.optional(DeviceBoundSessionFetchResult),
   newSession: Schema.optional(DeviceBoundSession),
@@ -782,8 +769,8 @@ export const ReportingApiReport = Schema.Struct({
   destination: Schema.String,
   type: Schema.String,
   timestamp: TimeSinceEpoch,
-  depth: Schema.Number,
-  completedAttempts: Schema.Number,
+  depth: Schema.Int,
+  completedAttempts: Schema.Int,
   body: Schema.Json,
   status: ReportStatus,
 }).annotate({ identifier: "Network.ReportingApiReport" });
@@ -836,12 +823,6 @@ export const Request = Schema.Struct({
   isAdRelated: Schema.optional(Schema.Boolean),
 }).annotate({ identifier: "Network.Request" });
 
-export const RequestPattern = Schema.Struct({
-  urlPattern: Schema.optional(Schema.String),
-  resourceType: Schema.optional(ResourceType),
-  interceptionStage: Schema.optional(InterceptionStage),
-}).annotate({ identifier: "Network.RequestPattern" });
-
 export const SecurityIsolationStatus = Schema.Struct({
   coop: Schema.optional(CrossOriginOpenerPolicyStatus),
   coep: Schema.optional(CrossOriginEmbedderPolicyStatus),
@@ -859,7 +840,7 @@ export const SignedExchangeErrorField = Schema.Literals([
 
 export const SignedExchangeError = Schema.Struct({
   message: Schema.String,
-  signatureIndex: Schema.optional(Schema.Number),
+  signatureIndex: Schema.optional(Schema.Int),
   errorField: Schema.optional(SignedExchangeErrorField),
 }).annotate({ identifier: "Network.SignedExchangeError" });
 
@@ -870,14 +851,14 @@ export const SignedExchangeSignature = Schema.Struct({
   certUrl: Schema.optional(Schema.String),
   certSha256: Schema.optional(Schema.String),
   validityUrl: Schema.String,
-  date: Schema.Number,
-  expires: Schema.Number,
+  date: Schema.Int,
+  expires: Schema.Int,
   certificates: Schema.optional(Schema.Array(Schema.String)),
 }).annotate({ identifier: "Network.SignedExchangeSignature" });
 
 export const SignedExchangeHeader = Schema.Struct({
   requestUrl: Schema.String,
-  responseCode: Schema.Number,
+  responseCode: Schema.Int,
   responseHeaders: Headers,
   signatures: Schema.Array(SignedExchangeSignature),
   headerIntegrity: Schema.String,
@@ -906,7 +887,7 @@ export const TerminationEventDetails = Schema.Struct({
 }).annotate({ identifier: "Network.TerminationEventDetails" });
 
 export const WebSocketFrame = Schema.Struct({
-  opcode: Schema.Number,
+  opcode: Schema.Finite,
   mask: Schema.Boolean,
   payloadData: Schema.String,
 }).annotate({ identifier: "Network.WebSocketFrame" });
@@ -916,7 +897,7 @@ export const WebSocketRequest = Schema.Struct({
 }).annotate({ identifier: "Network.WebSocketRequest" });
 
 export const WebSocketResponse = Schema.Struct({
-  status: Schema.Number,
+  status: Schema.Int,
   statusText: Schema.String,
   headers: Headers,
   headersText: Schema.optional(Schema.String),
@@ -957,17 +938,6 @@ export const canEmulateNetworkConditions = {
   }).annotate({ identifier: "Network.canEmulateNetworkConditions.result" }),
 } as const;
 
-/** @experimental Clears accepted encodings set by setAcceptedEncodings */
-export const clearAcceptedEncodingsOverride = {
-  method: "Network.clearAcceptedEncodingsOverride" as const,
-  params: Schema.Struct({}).annotate({
-    identifier: "Network.clearAcceptedEncodingsOverride.params",
-  }),
-  result: Schema.Struct({}).annotate({
-    identifier: "Network.clearAcceptedEncodingsOverride.result",
-  }),
-} as const;
-
 export const clearBrowserCache = {
   method: "Network.clearBrowserCache" as const,
   params: Schema.Struct({}).annotate({
@@ -994,33 +964,11 @@ If maxTotalBufferSize is not set, durable messages are disabled. */
 export const configureDurableMessages = {
   method: "Network.configureDurableMessages" as const,
   params: Schema.Struct({
-    maxTotalBufferSize: Schema.optional(Schema.Number),
-    maxResourceBufferSize: Schema.optional(Schema.Number),
+    maxTotalBufferSize: Schema.optional(Schema.Int),
+    maxResourceBufferSize: Schema.optional(Schema.Int),
   }).annotate({ identifier: "Network.configureDurableMessages.params" }),
   result: Schema.Struct({}).annotate({
     identifier: "Network.configureDurableMessages.result",
-  }),
-} as const;
-
-/** @deprecated @experimental Response to Network.requestIntercepted which either modifies the request to continue with any
-modifications, or blocks it, or completes it with the provided response bytes. If a network
-fetch occurs as a result which encounters a redirect an additional Network.requestIntercepted
-event will be sent with the same InterceptionId.
-Deprecated, use Fetch.continueRequest, Fetch.fulfillRequest and Fetch.failRequest instead. */
-export const continueInterceptedRequest = {
-  method: "Network.continueInterceptedRequest" as const,
-  params: Schema.Struct({
-    interceptionId: InterceptionId,
-    errorReason: Schema.optional(ErrorReason),
-    rawResponse: Schema.optional(Schema.String),
-    url: Schema.optional(Schema.String),
-    method: Schema.optional(Schema.String),
-    postData: Schema.optional(Schema.String),
-    headers: Schema.optional(Headers),
-    authChallengeResponse: Schema.optional(AuthChallengeResponse),
-  }).annotate({ identifier: "Network.continueInterceptedRequest.params" }),
-  result: Schema.Struct({}).annotate({
-    identifier: "Network.continueInterceptedRequest.result",
   }),
 } as const;
 
@@ -1063,14 +1011,14 @@ export const emulateNetworkConditions = {
   method: "Network.emulateNetworkConditions" as const,
   params: Schema.Struct({
     offline: Schema.Boolean,
-    latency: Schema.Number,
-    downloadThroughput: Schema.Number,
-    uploadThroughput: Schema.Number,
+    latency: Schema.Finite,
+    downloadThroughput: Schema.Finite,
+    uploadThroughput: Schema.Finite,
     connectionType: Schema.optional(ConnectionType),
     /** @experimental WebRTC packet loss (percent, 0-100). 0 disables packet loss emulation, 100 drops all the packets. */
-    packetLoss: Schema.optional(Schema.Number),
+    packetLoss: Schema.optional(Schema.Finite),
     /** @experimental WebRTC packet queue length (packet). 0 removes any queue length limitations. */
-    packetQueueLength: Schema.optional(Schema.Number),
+    packetQueueLength: Schema.optional(Schema.Int),
     /** @experimental WebRTC packetReordering feature. */
     packetReordering: Schema.optional(Schema.Boolean),
   }).annotate({ identifier: "Network.emulateNetworkConditions.params" }),
@@ -1102,10 +1050,10 @@ export const enable = {
     /** @experimental Buffer size in bytes to use when preserving network payloads (XHRs, etc).
     This is the maximum number of bytes that will be collected by this
     DevTools session. */
-    maxTotalBufferSize: Schema.optional(Schema.Number),
+    maxTotalBufferSize: Schema.optional(Schema.Int),
     /** @experimental Per-resource buffer size in bytes to use when preserving network payloads (XHRs, etc). */
-    maxResourceBufferSize: Schema.optional(Schema.Number),
-    maxPostDataSize: Schema.optional(Schema.Number),
+    maxResourceBufferSize: Schema.optional(Schema.Int),
+    maxPostDataSize: Schema.optional(Schema.Int),
     /** @experimental Whether DirectSocket chunk send/receive events should be reported. */
     reportDirectSocketTraffic: Schema.optional(Schema.Boolean),
     /** @experimental Enable storing response bodies outside of renderer, so that these survive
@@ -1208,18 +1156,6 @@ export const getResponseBody = {
   }).annotate({ identifier: "Network.getResponseBody.result" }),
 } as const;
 
-/** @experimental Returns content served for the given currently intercepted request. */
-export const getResponseBodyForInterception = {
-  method: "Network.getResponseBodyForInterception" as const,
-  params: Schema.Struct({
-    interceptionId: InterceptionId,
-  }).annotate({ identifier: "Network.getResponseBodyForInterception.params" }),
-  result: Schema.Struct({
-    body: Schema.String,
-    base64Encoded: Schema.Boolean,
-  }).annotate({ identifier: "Network.getResponseBodyForInterception.result" }),
-} as const;
-
 /** @experimental Returns information about the COEP/COOP isolation status. */
 export const getSecurityIsolationStatus = {
   method: "Network.getSecurityIsolationStatus" as const,
@@ -1249,9 +1185,9 @@ export const overrideNetworkState = {
   method: "Network.overrideNetworkState" as const,
   params: Schema.Struct({
     offline: Schema.Boolean,
-    latency: Schema.Number,
-    downloadThroughput: Schema.Number,
-    uploadThroughput: Schema.Number,
+    latency: Schema.Finite,
+    downloadThroughput: Schema.Finite,
+    uploadThroughput: Schema.Finite,
     connectionType: Schema.optional(ConnectionType),
   }).annotate({ identifier: "Network.overrideNetworkState.params" }),
   result: Schema.Struct({}).annotate({
@@ -1284,17 +1220,6 @@ export const searchInResponseBody = {
   result: Schema.Struct({
     result: Schema.Array(Debugger.SearchMatch),
   }).annotate({ identifier: "Network.searchInResponseBody.result" }),
-} as const;
-
-/** @experimental Sets a list of content encodings that will be accepted. Empty list means no encoding is accepted. */
-export const setAcceptedEncodings = {
-  method: "Network.setAcceptedEncodings" as const,
-  params: Schema.Struct({
-    encodings: Schema.Array(ContentEncoding),
-  }).annotate({ identifier: "Network.setAcceptedEncodings.params" }),
-  result: Schema.Struct({}).annotate({
-    identifier: "Network.setAcceptedEncodings.result",
-  }),
 } as const;
 
 /** @experimental Specifies whether to attach a page script stack id in requests */
@@ -1360,7 +1285,7 @@ export const setCookie = {
     /** @experimental Cookie source port. Valid values are {-1, [1, 65535]}, -1 indicates an unspecified port.
     An unspecified port value allows protocol clients to emulate legacy cookie scope for the port.
     This is a temporary ability and it will be removed in the future. */
-    sourcePort: Schema.optional(Schema.Number),
+    sourcePort: Schema.optional(Schema.Int),
     /** @experimental Cookie partition key. If not set, the cookie will be set as not partitioned. */
     partitionKey: Schema.optional(CookiePartitionKey),
   }).annotate({ identifier: "Network.setCookie.params" }),
@@ -1402,18 +1327,6 @@ export const setExtraHTTPHeaders = {
   }),
 } as const;
 
-/** @deprecated @experimental Sets the requests to intercept that match the provided patterns and optionally resource types.
-Deprecated, please use Fetch.enable instead. */
-export const setRequestInterception = {
-  method: "Network.setRequestInterception" as const,
-  params: Schema.Struct({
-    patterns: Schema.Array(RequestPattern),
-  }).annotate({ identifier: "Network.setRequestInterception.params" }),
-  result: Schema.Struct({}).annotate({
-    identifier: "Network.setRequestInterception.result",
-  }),
-} as const;
-
 export const setUserAgentOverride = {
   method: "Network.setUserAgentOverride" as const,
   params: Schema.Struct({
@@ -1442,31 +1355,13 @@ export const streamResourceContent = {
   }).annotate({ identifier: "Network.streamResourceContent.result" }),
 } as const;
 
-/** @experimental Returns a handle to the stream representing the response body. Note that after this command,
-the intercepted request can't be continued as is -- you either need to cancel it or to provide
-the response body. The stream only supports sequential read, IO.read will fail if the position
-is specified. */
-export const takeResponseBodyForInterceptionAsStream = {
-  method: "Network.takeResponseBodyForInterceptionAsStream" as const,
-  params: Schema.Struct({
-    interceptionId: InterceptionId,
-  }).annotate({
-    identifier: "Network.takeResponseBodyForInterceptionAsStream.params",
-  }),
-  result: Schema.Struct({
-    stream: IO.StreamHandle,
-  }).annotate({
-    identifier: "Network.takeResponseBodyForInterceptionAsStream.result",
-  }),
-} as const;
-
 export const dataReceived = {
   method: "Network.dataReceived" as const,
   params: Schema.Struct({
     requestId: RequestId,
     timestamp: MonotonicTime,
-    dataLength: Schema.Number,
-    encodedDataLength: Schema.Number,
+    dataLength: Schema.Int,
+    encodedDataLength: Schema.Int,
     /** @experimental Data that was received. (Encoded as a base64 string when passed over JSON) */
     data: Schema.optional(Schema.String),
   }).annotate({ identifier: "Network.dataReceived.params" }),
@@ -1500,7 +1395,7 @@ export const directTCPSocketAborted = {
   method: "Network.directTCPSocketAborted" as const,
   params: Schema.Struct({
     identifier: RequestId,
-    errorMessage: Schema.String,
+    errorMessage: ErrorReason,
     timestamp: MonotonicTime,
   }).annotate({ identifier: "Network.directTCPSocketAborted.params" }),
 } as const;
@@ -1540,7 +1435,7 @@ export const directTCPSocketCreated = {
   params: Schema.Struct({
     identifier: RequestId,
     remoteAddr: Schema.String,
-    remotePort: Schema.Number,
+    remotePort: Schema.Int,
     options: DirectTCPSocketOptions,
     timestamp: MonotonicTime,
     initiator: Schema.optional(Initiator),
@@ -1553,10 +1448,10 @@ export const directTCPSocketOpened = {
   params: Schema.Struct({
     identifier: RequestId,
     remoteAddr: Schema.String,
-    remotePort: Schema.Number,
+    remotePort: Schema.Int,
     timestamp: MonotonicTime,
     localAddr: Schema.optional(Schema.String),
-    localPort: Schema.optional(Schema.Number),
+    localPort: Schema.optional(Schema.Int),
   }).annotate({ identifier: "Network.directTCPSocketOpened.params" }),
 } as const;
 
@@ -1565,7 +1460,7 @@ export const directUDPSocketAborted = {
   method: "Network.directUDPSocketAborted" as const,
   params: Schema.Struct({
     identifier: RequestId,
-    errorMessage: Schema.String,
+    errorMessage: ErrorReason,
     timestamp: MonotonicTime,
   }).annotate({ identifier: "Network.directUDPSocketAborted.params" }),
 } as const;
@@ -1638,10 +1533,10 @@ export const directUDPSocketOpened = {
   params: Schema.Struct({
     identifier: RequestId,
     localAddr: Schema.String,
-    localPort: Schema.Number,
+    localPort: Schema.Int,
     timestamp: MonotonicTime,
     remoteAddr: Schema.optional(Schema.String),
-    remotePort: Schema.optional(Schema.Number),
+    remotePort: Schema.optional(Schema.Int),
   }).annotate({ identifier: "Network.directUDPSocketOpened.params" }),
 } as const;
 
@@ -1674,7 +1569,7 @@ export const loadingFinished = {
   params: Schema.Struct({
     requestId: RequestId,
     timestamp: MonotonicTime,
-    encodedDataLength: Schema.Number,
+    encodedDataLength: Schema.Finite,
   }).annotate({ identifier: "Network.loadingFinished.params" }),
 } as const;
 
@@ -1712,27 +1607,6 @@ export const reportingApiReportUpdated = {
   params: Schema.Struct({
     report: ReportingApiReport,
   }).annotate({ identifier: "Network.reportingApiReportUpdated.params" }),
-} as const;
-
-/** @deprecated @experimental Details of an intercepted HTTP request, which must be either allowed, blocked, modified or
-mocked.
-Deprecated, use Fetch.requestPaused instead. */
-export const requestIntercepted = {
-  method: "Network.requestIntercepted" as const,
-  params: Schema.Struct({
-    interceptionId: InterceptionId,
-    request: Request,
-    frameId: Schema.suspend(() => Page.FrameId),
-    resourceType: ResourceType,
-    isNavigationRequest: Schema.Boolean,
-    isDownload: Schema.optional(Schema.Boolean),
-    redirectUrl: Schema.optional(Schema.String),
-    authChallenge: Schema.optional(AuthChallenge),
-    responseErrorReason: Schema.optional(ErrorReason),
-    responseStatusCode: Schema.optional(Schema.Number),
-    responseHeaders: Schema.optional(Headers),
-    requestId: Schema.optional(RequestId),
-  }).annotate({ identifier: "Network.requestIntercepted.params" }),
 } as const;
 
 export const requestServedFromCache = {
@@ -1832,7 +1706,7 @@ export const responseReceivedExtraInfo = {
     blockedCookies: Schema.Array(BlockedSetCookieWithReason),
     headers: Headers,
     resourceIPAddressSpace: IPAddressSpace,
-    statusCode: Schema.Number,
+    statusCode: Schema.Int,
     headersText: Schema.optional(Schema.String),
     /** @experimental The cookie partition key that will be used to store partitioned cookies set in this response.
     Only sent when partitioned cookies are enabled. */
@@ -1877,7 +1751,7 @@ export const trustTokenOperationDone = {
     requestId: RequestId,
     topLevelOrigin: Schema.optional(Schema.String),
     issuerOrigin: Schema.optional(Schema.String),
-    issuedTokenCount: Schema.optional(Schema.Number),
+    issuedTokenCount: Schema.optional(Schema.Int),
   }).annotate({ identifier: "Network.trustTokenOperationDone.params" }),
 } as const;
 

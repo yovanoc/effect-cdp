@@ -7,7 +7,7 @@ export const CertificateErrorAction = Schema.Literals([
   "cancel",
 ]).annotate({ identifier: "Security.CertificateErrorAction" });
 
-export const CertificateId = Schema.Number.annotate({
+export const CertificateId = Schema.Int.annotate({
   identifier: "Security.CertificateId",
 });
 
@@ -100,7 +100,7 @@ export const enable = {
 export const handleCertificateError = {
   method: "Security.handleCertificateError" as const,
   params: Schema.Struct({
-    eventId: Schema.Number,
+    eventId: Schema.Int,
     action: CertificateErrorAction,
   }).annotate({ identifier: "Security.handleCertificateError.params" }),
   result: Schema.Struct({}).annotate({
@@ -137,7 +137,7 @@ certificate errors at the same time. */
 export const certificateError = {
   method: "Security.certificateError" as const,
   params: Schema.Struct({
-    eventId: Schema.Number,
+    eventId: Schema.Int,
     errorType: Schema.String,
     requestURL: Schema.String,
   }).annotate({ identifier: "Security.certificateError.params" }),

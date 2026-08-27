@@ -11,8 +11,7 @@ import {
   Schema,
   Stream,
 } from "effect";
-import { spawn } from "node:child_process";
-import { execSync } from "node:child_process";
+import { execSync, spawn } from "node:child_process";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -58,25 +57,30 @@ const parseFlags = (
   return { test, host, chromiumPath };
 };
 
-class NoTargetsError extends Schema.TaggedErrorClass<NoTargetsError>(
+class NoTargetsError extends Schema.TaggedError<NoTargetsError>()(
   "NoTargetsError",
-)("NoTargetsError", { message: Schema.String }) {}
+  { message: Schema.String },
+) {}
 
-class MissingWebSocketUrlError extends Schema.TaggedErrorClass<MissingWebSocketUrlError>(
+class MissingWebSocketUrlError extends Schema.TaggedError<MissingWebSocketUrlError>()(
   "MissingWebSocketUrlError",
-)("MissingWebSocketUrlError", { message: Schema.String }) {}
+  { message: Schema.String },
+) {}
 
-class AssertionError extends Schema.TaggedErrorClass<AssertionError>(
+class AssertionError extends Schema.TaggedError<AssertionError>()(
   "AssertionError",
-)("AssertionError", { message: Schema.String }) {}
+  { message: Schema.String },
+) {}
 
-class ChromiumNotFoundError extends Schema.TaggedErrorClass<ChromiumNotFoundError>(
+class ChromiumNotFoundError extends Schema.TaggedError<ChromiumNotFoundError>()(
   "ChromiumNotFoundError",
-)("ChromiumNotFoundError", { message: Schema.String }) {}
+  { message: Schema.String },
+) {}
 
-class ChromiumLaunchTimeoutError extends Schema.TaggedErrorClass<ChromiumLaunchTimeoutError>(
+class ChromiumLaunchTimeoutError extends Schema.TaggedError<ChromiumLaunchTimeoutError>()(
   "ChromiumLaunchTimeoutError",
-)("ChromiumLaunchTimeoutError", { message: Schema.String }) {}
+  { message: Schema.String },
+) {}
 
 const discoverConfig = Effect.fnUntraced(function* (host: string) {
   const bootstrap = HttpDiscovery.layer({
@@ -85,8 +89,8 @@ const discoverConfig = Effect.fnUntraced(function* (host: string) {
   });
   const result = yield* Effect.gen(function* () {
     const discovery = yield* HttpDiscovery;
-    yield* discovery.version();
-    const targets = yield* discovery.list();
+    yield* discovery.version;
+    const targets = yield* discovery.list;
     const pageTarget = targets.find((t) => t.type === "page");
     if (pageTarget === undefined) {
       return yield* new NoTargetsError({ message: "no page targets found" });
@@ -110,7 +114,7 @@ const runDefault = Effect.fnUntraced(function* (targetId: string) {
 
   const sessionId = yield* Target.attach(cdp, targetId);
 
-  const sum = yield* Runtime.evaluate(cdp, sessionId, "1+1", Schema.Number);
+  const sum = yield* Runtime.evaluate(cdp, sessionId, "1+1", Schema.Finite);
   if (sum !== 2) {
     return yield* new AssertionError({
       message: `expected 1+1 === 2, got ${sum}`,
@@ -192,7 +196,7 @@ const runDetach = Effect.fnUntraced(function* (targetId: string) {
     "OK child session failed with CdpDisconnected{reason:'TargetDetached'}",
   );
 
-  const one = yield* Runtime.evaluate(cdp, parentSessionId, "1", Schema.Number);
+  const one = yield* Runtime.evaluate(cdp, parentSessionId, "1", Schema.Finite);
   if (one !== 1) {
     return yield* new AssertionError({
       message: `expected parent Runtime.evaluate('1') === 1, got ${one}`,
@@ -423,7 +427,7 @@ const runDiscovery = Effect.fnUntraced(function* (host: string) {
   yield* Effect.gen(function* () {
     const discovery = yield* HttpDiscovery;
 
-    const version = yield* discovery.version();
+    const version = yield* discovery.version;
     if (typeof version.Browser !== "string" || version.Browser.length === 0) {
       return yield* new AssertionError({
         message: `version.Browser missing or empty, got ${String(version.Browser)}`,
@@ -449,7 +453,7 @@ const runDiscovery = Effect.fnUntraced(function* (host: string) {
       `OK version Browser=${version.Browser} Protocol-Version=${version["Protocol-Version"]}`,
     );
 
-    const targets = yield* discovery.list();
+    const targets = yield* discovery.list;
     if (targets.length < 1) {
       return yield* new AssertionError({
         message: `expected list() length >= 1, got ${targets.length}`,
@@ -530,7 +534,7 @@ const waitForChromium = (
   const ping = Effect.tryPromise({
     try: () => fetch(`${host}/json/version`).then((r) => r.ok),
     catch: () => false as const,
-  }).pipe(Effect.catch(() => Effect.succeed(false as boolean)));
+  }).pipe(Effect.orElseSucceed(() => false));
   return Effect.gen(function* () {
     const start = Date.now();
     while (Date.now() - start < 10_000) {

@@ -42,10 +42,10 @@ export const ShorthandEntry = Schema.Struct({
 }).annotate({ identifier: "CSS.ShorthandEntry" });
 
 export const SourceRange = Schema.Struct({
-  startLine: Schema.Number,
-  startColumn: Schema.Number,
-  endLine: Schema.Number,
-  endColumn: Schema.Number,
+  startLine: Schema.Int,
+  startColumn: Schema.Int,
+  endLine: Schema.Int,
+  endColumn: Schema.Int,
 }).annotate({ identifier: "CSS.SourceRange" });
 
 export const CSSStyle = Schema.Struct({
@@ -68,10 +68,18 @@ export const StyleSheetOrigin = Schema.Literals([
   "regular",
 ]).annotate({ identifier: "CSS.StyleSheetOrigin" });
 
+export const SpecificityComponent = Schema.Struct({
+  text: Schema.String,
+  a: Schema.Int,
+  b: Schema.Int,
+  c: Schema.Int,
+}).annotate({ identifier: "CSS.SpecificityComponent" });
+
 export const Specificity = Schema.Struct({
-  a: Schema.Number,
-  b: Schema.Number,
-  c: Schema.Number,
+  a: Schema.Int,
+  b: Schema.Int,
+  c: Schema.Int,
+  components: Schema.optional(Schema.Array(SpecificityComponent)),
 }).annotate({ identifier: "CSS.Specificity" });
 
 export const Value = Schema.Struct({
@@ -200,16 +208,16 @@ export const CSSLayerData: Schema.Schema<CSSCSSLayerDataType> = Schema.suspend(
     Schema.Struct({
       name: Schema.String,
       subLayers: Schema.optional(Schema.Array(CSSLayerData)),
-      order: Schema.Number,
+      order: Schema.Finite,
     }),
 ).annotate({ identifier: "CSS.CSSLayerData" });
 
 export const MediaQueryExpression = Schema.Struct({
-  value: Schema.Number,
+  value: Schema.Finite,
   unit: Schema.String,
   feature: Schema.String,
   valueRange: Schema.optional(SourceRange),
-  computedLength: Schema.optional(Schema.Number),
+  computedLength: Schema.optional(Schema.Finite),
 }).annotate({ identifier: "CSS.MediaQueryExpression" });
 
 export const MediaQuery = Schema.Struct({
@@ -324,11 +332,11 @@ export const CSSStyleSheetHeader = Schema.Struct({
   isInline: Schema.Boolean,
   isMutable: Schema.Boolean,
   isConstructed: Schema.Boolean,
-  startLine: Schema.Number,
-  startColumn: Schema.Number,
-  length: Schema.Number,
-  endLine: Schema.Number,
-  endColumn: Schema.Number,
+  startLine: Schema.Finite,
+  startColumn: Schema.Finite,
+  length: Schema.Finite,
+  endLine: Schema.Finite,
+  endColumn: Schema.Finite,
   loadingFailed: Schema.optional(Schema.Boolean),
 }).annotate({ identifier: "CSS.CSSStyleSheetHeader" });
 
@@ -341,9 +349,9 @@ export const CSSTryRule = Schema.Struct({
 export const FontVariationAxis = Schema.Struct({
   tag: Schema.String,
   name: Schema.String,
-  minValue: Schema.Number,
-  maxValue: Schema.Number,
-  defaultValue: Schema.Number,
+  minValue: Schema.Finite,
+  maxValue: Schema.Finite,
+  defaultValue: Schema.Finite,
 }).annotate({ identifier: "CSS.FontVariationAxis" });
 
 export const FontFace = Schema.Struct({
@@ -366,7 +374,7 @@ export const InheritedAnimatedStyleEntry = Schema.Struct({
 
 export const RuleMatch = Schema.Struct({
   rule: CSSRule,
-  matchingSelectors: Schema.Array(Schema.Number),
+  matchingSelectors: Schema.Array(Schema.Int),
 }).annotate({ identifier: "CSS.RuleMatch" });
 
 export const PseudoElementMatches = Schema.Struct({
@@ -388,13 +396,13 @@ export const PlatformFontUsage = Schema.Struct({
   familyName: Schema.String,
   postScriptName: Schema.String,
   isCustomFont: Schema.Boolean,
-  glyphCount: Schema.Number,
+  glyphCount: Schema.Finite,
 }).annotate({ identifier: "CSS.PlatformFontUsage" });
 
 export const RuleUsage = Schema.Struct({
   styleSheetId: DOM.StyleSheetId,
-  startOffset: Schema.Number,
-  endOffset: Schema.Number,
+  startOffset: Schema.Finite,
+  endOffset: Schema.Finite,
   used: Schema.Boolean,
 }).annotate({ identifier: "CSS.RuleUsage" });
 
@@ -591,7 +599,7 @@ export const getMatchedStylesForNode = {
     ),
     cssKeyframesRules: Schema.optional(Schema.Array(CSSKeyframesRule)),
     cssPositionTryRules: Schema.optional(Schema.Array(CSSPositionTryRule)),
-    activePositionFallbackIndex: Schema.optional(Schema.Number),
+    activePositionFallbackIndex: Schema.optional(Schema.Int),
     cssPropertyRules: Schema.optional(Schema.Array(CSSPropertyRule)),
     cssPropertyRegistrations: Schema.optional(
       Schema.Array(CSSPropertyRegistration),
@@ -859,7 +867,7 @@ export const takeCoverageDelta = {
   }),
   result: Schema.Struct({
     coverage: Schema.Array(RuleUsage),
-    timestamp: Schema.Number,
+    timestamp: Schema.Finite,
   }).annotate({ identifier: "CSS.takeCoverageDelta.result" }),
 } as const;
 

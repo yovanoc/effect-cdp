@@ -7,11 +7,11 @@ describe("emitTypeRef", () => {
   });
 
   it("integer primitive", () => {
-    expect(emitTypeRef({ type: "integer" }, "Page")).toBe("Schema.Number");
+    expect(emitTypeRef({ type: "integer" }, "Page")).toBe("Schema.Int");
   });
 
   it("number primitive", () => {
-    expect(emitTypeRef({ type: "number" }, "Page")).toBe("Schema.Number");
+    expect(emitTypeRef({ type: "number" }, "Page")).toBe("Schema.Finite");
   });
 
   it("boolean primitive", () => {

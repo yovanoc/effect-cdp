@@ -59,7 +59,7 @@ export const continueResponse = {
   method: "Fetch.continueResponse" as const,
   params: Schema.Struct({
     requestId: RequestId,
-    responseCode: Schema.optional(Schema.Number),
+    responseCode: Schema.optional(Schema.Int),
     responsePhrase: Schema.optional(Schema.String),
     responseHeaders: Schema.optional(Schema.Array(HeaderEntry)),
     binaryResponseHeaders: Schema.optional(Schema.String),
@@ -110,7 +110,7 @@ export const fulfillRequest = {
   method: "Fetch.fulfillRequest" as const,
   params: Schema.Struct({
     requestId: RequestId,
-    responseCode: Schema.Number,
+    responseCode: Schema.Int,
     responseHeaders: Schema.optional(Schema.Array(HeaderEntry)),
     binaryResponseHeaders: Schema.optional(Schema.String),
     body: Schema.optional(Schema.String),
@@ -161,7 +161,7 @@ export const requestPaused = {
     frameId: Page.FrameId,
     resourceType: Network.ResourceType,
     responseErrorReason: Schema.optional(Network.ErrorReason),
-    responseStatusCode: Schema.optional(Schema.Number),
+    responseStatusCode: Schema.optional(Schema.Int),
     responseStatusText: Schema.optional(Schema.String),
     responseHeaders: Schema.optional(Schema.Array(HeaderEntry)),
     networkId: Schema.optional(Network.RequestId),

@@ -39,7 +39,7 @@
     }
   },
   "scripts": {
-    "prepare": "effect-tsgo patch && ./scripts/prepare-effect.sh",
+    "prepare": "effect-tsgo patch --typescript --oxlint",
     "codegen": "bun scripts/codegen.ts",
     "check-codegen": "bun scripts/check-codegen.ts",
     "build": "tsdown",
@@ -51,35 +51,35 @@
     "lint:fix": "oxlint --fix",
     "fmt": "oxfmt",
     "fmt:check": "oxfmt --check",
-    "ts:check": "tsgo --noEmit",
+    "ts:check": "tsc --noEmit",
     "check": "bun run --parallel fmt:check lint ts:check test",
     "prepublishOnly": "bun run build",
     "release": "changeset publish"
   },
   "devDependencies": {
-    "@changesets/changelog-github": "^0.7.0",
-    "@changesets/cli": "^2.31.0",
-    "@effect/platform-bun": ">=4.0.0-beta.68 || >=4.0.0",
-    "@effect/platform-node": ">=4.0.0-beta.68 || >=4.0.0",
-    "@effect/tsgo": "0.7.4",
-    "@effect/vitest": ">=4.0.0-beta.68 || >=4.0.0",
-    "@types/bun": "^1.3.14",
-    "@typescript/native-preview": "^7.0.0-dev.20260421.2",
-    "devtools-protocol": "^0.0.1632630",
-    "lint-staged": "^17.0.5",
-    "oxfmt": "^0.51.0",
-    "oxlint": "^1.66.0",
-    "oxlint-tsgolint": "^0.23.0",
-    "testcontainers": "^12.0.0",
-    "tsdown": "^0.22.0",
-    "typescript": "^6.0.3",
-    "vitest": "^4.1.6",
-    "ws": "^8.18.0"
+    "@changesets/changelog-github": "1.0.0",
+    "@changesets/cli": "3.0.1",
+    "@effect/platform-bun": "4.0.0-rc.112",
+    "@effect/platform-node": "4.0.0-rc.112",
+    "@effect/tsgo": "0.37.0",
+    "@effect/vitest": "4.0.0-rc.112",
+    "@types/bun": "1.4.0",
+    "devtools-protocol": "0.0.1686980",
+    "effect": "4.0.0-rc.112",
+    "lint-staged": "17.3.0",
+    "oxfmt": "0.65.0",
+    "oxlint": "1.80.0",
+    "oxlint-tsgolint": "7.0.2001",
+    "testcontainers": "12.1.0",
+    "tsdown": "0.22.14",
+    "typescript": "7.0.2",
+    "vitest": "4.1.11",
+    "ws": "8.21.3"
   },
   "peerDependencies": {
-    "@effect/platform-bun": ">=4.0.0-beta.68 || >=4.0.0",
-    "@effect/platform-node": ">=4.0.0-beta.68 || >=4.0.0",
-    "effect": ">=4.0.0-beta.68 || >=4.0.0"
+    "@effect/platform-bun": ">=4.0.0-rc.112 || >=4.0.0",
+    "@effect/platform-node": ">=4.0.0-rc.112 || >=4.0.0",
+    "effect": ">=4.0.0-rc.112 || >=4.0.0"
   },
   "peerDependenciesMeta": {
     "@effect/platform-bun": {

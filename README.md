@@ -1,5 +1,4 @@
 
-
 # effect-cdp
 
 Type-safe [Chrome DevTools Protocol](https://chromedevtools.github.io/devtools-protocol/) client for [Effect](https://effect.website/), built on `@effect/platform` with full streaming and error handling.
@@ -10,10 +9,10 @@ Generated from the [devtools-protocol](https://github.com/chromedevtools/devtool
 
 ```bash
 # Bun
-bun add effect-cdp effect@beta @effect/platform-bun@beta
+bun add effect-cdp effect@rc @effect/platform-bun@rc
 
 # Node.js
-npm install effect-cdp effect@beta @effect/platform-node@beta
+npm install effect-cdp effect@rc @effect/platform-node@rc
 ```
 
 ## Quickstart

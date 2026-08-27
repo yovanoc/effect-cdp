@@ -4,9 +4,9 @@ import * as Debugger from "./Debugger.js";
 import * as Runtime from "./Runtime.js";
 
 export const CoverageRange = Schema.Struct({
-  startOffset: Schema.Number,
-  endOffset: Schema.Number,
-  count: Schema.Number,
+  startOffset: Schema.Int,
+  endOffset: Schema.Int,
+  count: Schema.Int,
 }).annotate({ identifier: "Profiler.CoverageRange" });
 
 export const FunctionCoverage = Schema.Struct({
@@ -16,25 +16,25 @@ export const FunctionCoverage = Schema.Struct({
 }).annotate({ identifier: "Profiler.FunctionCoverage" });
 
 export const PositionTickInfo = Schema.Struct({
-  line: Schema.Number,
-  ticks: Schema.Number,
+  line: Schema.Int,
+  ticks: Schema.Int,
 }).annotate({ identifier: "Profiler.PositionTickInfo" });
 
 export const ProfileNode = Schema.Struct({
-  id: Schema.Number,
+  id: Schema.Int,
   callFrame: Runtime.CallFrame,
-  hitCount: Schema.optional(Schema.Number),
-  children: Schema.optional(Schema.Array(Schema.Number)),
+  hitCount: Schema.optional(Schema.Int),
+  children: Schema.optional(Schema.Array(Schema.Int)),
   deoptReason: Schema.optional(Schema.String),
   positionTicks: Schema.optional(Schema.Array(PositionTickInfo)),
 }).annotate({ identifier: "Profiler.ProfileNode" });
 
 export const Profile = Schema.Struct({
   nodes: Schema.Array(ProfileNode),
-  startTime: Schema.Number,
-  endTime: Schema.Number,
-  samples: Schema.optional(Schema.Array(Schema.Number)),
-  timeDeltas: Schema.optional(Schema.Array(Schema.Number)),
+  startTime: Schema.Finite,
+  endTime: Schema.Finite,
+  samples: Schema.optional(Schema.Array(Schema.Int)),
+  timeDeltas: Schema.optional(Schema.Array(Schema.Int)),
 }).annotate({ identifier: "Profiler.Profile" });
 
 export const ScriptCoverage = Schema.Struct({
@@ -68,7 +68,7 @@ export const getBestEffortCoverage = {
 export const setSamplingInterval = {
   method: "Profiler.setSamplingInterval" as const,
   params: Schema.Struct({
-    interval: Schema.Number,
+    interval: Schema.Int,
   }).annotate({ identifier: "Profiler.setSamplingInterval.params" }),
   result: Schema.Struct({}).annotate({
     identifier: "Profiler.setSamplingInterval.result",
@@ -89,7 +89,7 @@ export const startPreciseCoverage = {
     allowTriggeredUpdates: Schema.optional(Schema.Boolean),
   }).annotate({ identifier: "Profiler.startPreciseCoverage.params" }),
   result: Schema.Struct({
-    timestamp: Schema.Number,
+    timestamp: Schema.Finite,
   }).annotate({ identifier: "Profiler.startPreciseCoverage.result" }),
 } as const;
 
@@ -118,7 +118,7 @@ export const takePreciseCoverage = {
   }),
   result: Schema.Struct({
     result: Schema.Array(ScriptCoverage),
-    timestamp: Schema.Number,
+    timestamp: Schema.Finite,
   }).annotate({ identifier: "Profiler.takePreciseCoverage.result" }),
 } as const;
 
@@ -148,7 +148,7 @@ trigger collection of coverage data immediately at a certain point in time. */
 export const preciseCoverageDeltaUpdate = {
   method: "Profiler.preciseCoverageDeltaUpdate" as const,
   params: Schema.Struct({
-    timestamp: Schema.Number,
+    timestamp: Schema.Finite,
     occasion: Schema.String,
     result: Schema.Array(ScriptCoverage),
   }).annotate({ identifier: "Profiler.preciseCoverageDeltaUpdate.params" }),

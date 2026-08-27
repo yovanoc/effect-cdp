@@ -89,8 +89,8 @@ export const runDispatcher = Effect.fnUntraced(function* (
   const decodeFailures = yield* Ref.make(0);
 
   const routeFrame = Effect.fnUntraced(function* (raw: string) {
-    const parsed = yield* Schema.decodeUnknownEffect(
-      Schema.UnknownFromJsonString,
+    const parsed = yield* Schema.decodeEffect(
+      Schema.fromJsonString(Schema.Json),
     )(raw).pipe(
       Effect.catch((error) =>
         logDecodeFailure(decodeFailures, raw, error).pipe(Effect.asVoid),

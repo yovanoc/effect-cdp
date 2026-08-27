@@ -20,37 +20,6 @@ export const AffectedRequest = Schema.Struct({
   url: Schema.String,
 }).annotate({ identifier: "Audits.AffectedRequest" });
 
-export const AttributionReportingIssueType = Schema.Literals([
-  "PermissionPolicyDisabled",
-  "UntrustworthyReportingOrigin",
-  "InsecureContext",
-  "InvalidHeader",
-  "InvalidRegisterTriggerHeader",
-  "SourceAndTriggerHeaders",
-  "SourceIgnored",
-  "TriggerIgnored",
-  "OsSourceIgnored",
-  "OsTriggerIgnored",
-  "InvalidRegisterOsSourceHeader",
-  "InvalidRegisterOsTriggerHeader",
-  "WebAndOsHeaders",
-  "NoWebOrOsSupport",
-  "NavigationRegistrationWithoutTransientUserActivation",
-  "InvalidInfoHeader",
-  "NoRegisterSourceHeader",
-  "NoRegisterTriggerHeader",
-  "NoRegisterOsSourceHeader",
-  "NoRegisterOsTriggerHeader",
-  "NavigationRegistrationUniqueScopeAlreadySet",
-]).annotate({ identifier: "Audits.AttributionReportingIssueType" });
-
-export const AttributionReportingIssueDetails = Schema.Struct({
-  violationType: AttributionReportingIssueType,
-  request: Schema.optional(AffectedRequest),
-  violatingNodeId: Schema.optional(DOM.BackendNodeId),
-  invalidParameter: Schema.optional(Schema.String),
-}).annotate({ identifier: "Audits.AttributionReportingIssueDetails" });
-
 export const BlockedByResponseReason = Schema.Literals([
   "CoepFrameResourceNeedsCoepHeader",
   "CoopSandboxedIFrameCannotNavigateToCoopPage",
@@ -81,8 +50,8 @@ export const ClientHintIssueReason = Schema.Literals([
 export const SourceCodeLocation = Schema.Struct({
   scriptId: Schema.optional(Runtime.ScriptId),
   url: Schema.String,
-  lineNumber: Schema.Number,
-  columnNumber: Schema.Number,
+  lineNumber: Schema.Int,
+  columnNumber: Schema.Int,
 }).annotate({ identifier: "Audits.SourceCodeLocation" });
 
 export const ClientHintIssueDetails = Schema.Struct({
@@ -97,6 +66,9 @@ export const ConnectionAllowlistError = Schema.Literals([
   "InvalidAllowlistItemType",
   "ReportingEndpointNotToken",
   "InvalidUrlPattern",
+  "IFrameAttributeLoosensEmbeddingRequirement",
+  "InvalidAllowConnectionAllowlistFrom",
+  "EmbeddingRequirementNotSatisfied",
 ]).annotate({ identifier: "Audits.ConnectionAllowlistError" });
 
 export const ConnectionAllowlistIssueDetails = Schema.Struct({
@@ -131,7 +103,7 @@ export const CookieOperation = Schema.Literals([
 
 export const CookieDeprecationMetadataIssueDetails = Schema.Struct({
   allowedSites: Schema.Array(Schema.String),
-  optOutPercentage: Schema.Number,
+  optOutPercentage: Schema.Finite,
   isOptOutTopLevel: Schema.Boolean,
   operation: CookieOperation,
 }).annotate({ identifier: "Audits.CookieDeprecationMetadataIssueDetails" });
@@ -219,6 +191,70 @@ export const ElementAccessibilityIssueDetails = Schema.Struct({
   hasDisallowedAttributes: Schema.Boolean,
 }).annotate({ identifier: "Audits.ElementAccessibilityIssueDetails" });
 
+export const EmailVerificationRequestIssueReason = Schema.Literals([
+  "InvalidEmail",
+  "DnsFetchFailed",
+  "DnsInvalidRecord",
+  "WellKnownHttpNotFound",
+  "WellKnownNoResponse",
+  "WellKnownInvalidResponse",
+  "WellKnownListEmpty",
+  "WellKnownInvalidContentType",
+  "WellKnownMissingIssuanceEndpoint",
+  "WellKnownIssuanceEndpointCrossOrigin",
+  "WellKnownUnsupportedSigningAlgorithm",
+  "TokenHttpNotFound",
+  "TokenNoResponse",
+  "TokenInvalidResponse",
+  "TokenInvalidContentType",
+  "TokenMalformedSdJwt",
+  "TokenInvalidSdJwt",
+  "KeyBindingSigningFailed",
+  "RpOriginIsOpaque",
+  "WellKnownMissingAccountsEndpoint",
+  "UserLoggedOut",
+  "WellKnownAccountsEndpointCrossOrigin",
+  "AccountsHttpNotFound",
+  "AccountsNoResponse",
+  "AccountsInvalidResponse",
+  "AccountsInvalidContentType",
+  "AccountsEmptyList",
+  "EmailVerificationWellKnownHttpNotFound",
+  "EmailVerificationWellKnownNoResponse",
+  "EmailVerificationWellKnownInvalidResponse",
+  "EmailVerificationWellKnownInvalidContentType",
+  "JwksHttpNotFound",
+  "JwksInvalidResponse",
+  "TokenVerificationSdJwtUnsupportedHeaderAlg",
+  "TokenVerificationSdJwtInvalidTyp",
+  "TokenVerificationSdJwtMissingIss",
+  "TokenVerificationSdJwtMissingIat",
+  "TokenVerificationSdJwtMissingCnf",
+  "TokenVerificationSdJwtMissingEmail",
+  "TokenVerificationSdJwtInvalidIssuedAt",
+  "TokenVerificationSdJwtInvalidIssuer",
+  "TokenVerificationSdJwtJwksMissingKeys",
+  "TokenVerificationSdJwtSignatureFailed",
+  "TokenVerificationSdJwtInvalidEmailVerified",
+  "TokenVerificationSdJwtInvalidEmail",
+  "TokenVerificationSdJwtInvalidHolderKey",
+  "TokenVerificationKbInvalidTyp",
+  "TokenVerificationKbMissingAud",
+  "TokenVerificationKbMissingNonce",
+  "TokenVerificationKbMissingIat",
+  "TokenVerificationKbMissingSdHash",
+  "TokenVerificationKbInvalidIssuedAt",
+  "TokenVerificationKbInvalidAudience",
+  "TokenVerificationKbInvalidNonce",
+  "TokenVerificationKbInvalidSdHash",
+  "TokenVerificationKbMissingCnf",
+  "TokenVerificationKbSignatureFailed",
+]).annotate({ identifier: "Audits.EmailVerificationRequestIssueReason" });
+
+export const EmailVerificationRequestIssueDetails = Schema.Struct({
+  emailVerificationRequestIssueReason: EmailVerificationRequestIssueReason,
+}).annotate({ identifier: "Audits.EmailVerificationRequestIssueDetails" });
+
 export const FailedRequestInfo = Schema.Struct({
   url: Schema.String,
   failureMessage: Schema.String,
@@ -230,6 +266,7 @@ export const FederatedAuthRequestIssueReason = Schema.Literals([
   "TooManyRequests",
   "WellKnownHttpNotFound",
   "WellKnownNoResponse",
+  "WellKnownBlockedByConnectionAllowlist",
   "WellKnownInvalidResponse",
   "WellKnownListEmpty",
   "WellKnownInvalidContentType",
@@ -237,6 +274,7 @@ export const FederatedAuthRequestIssueReason = Schema.Literals([
   "WellKnownTooBig",
   "ConfigHttpNotFound",
   "ConfigNoResponse",
+  "ConfigBlockedByConnectionAllowlist",
   "ConfigInvalidResponse",
   "ConfigInvalidContentType",
   "IdpNotPotentiallyTrustworthy",
@@ -246,11 +284,13 @@ export const FederatedAuthRequestIssueReason = Schema.Literals([
   "InvalidSigninResponse",
   "AccountsHttpNotFound",
   "AccountsNoResponse",
+  "AccountsBlockedByConnectionAllowlist",
   "AccountsInvalidResponse",
   "AccountsListEmpty",
   "AccountsInvalidContentType",
   "IdTokenHttpNotFound",
   "IdTokenNoResponse",
+  "IdTokenBlockedByConnectionAllowlist",
   "IdTokenInvalidResponse",
   "IdTokenIdpErrorResponse",
   "IdTokenCrossSiteIdpErrorResponse",
@@ -348,7 +388,6 @@ export const InspectorIssueCode = Schema.Literals([
   "ContentSecurityPolicyIssue",
   "SharedArrayBufferIssue",
   "CorsIssue",
-  "AttributionReportingIssue",
   "QuirksModeIssue",
   "PartitioningBlobURLIssue",
   "NavigatorUserAgentIssue",
@@ -370,7 +409,15 @@ export const InspectorIssueCode = Schema.Literals([
   "PermissionElementIssue",
   "PerformanceIssue",
   "SelectivePermissionsInterventionIssue",
+  "EmailVerificationRequestIssue",
+  "LazyLoadImageIssue",
 ]).annotate({ identifier: "Audits.InspectorIssueCode" });
+
+export const LazyLoadImageIssueDetails = Schema.Struct({
+  nodeId: DOM.BackendNodeId,
+  url: Schema.String,
+  frameId: Page.FrameId,
+}).annotate({ identifier: "Audits.LazyLoadImageIssueDetails" });
 
 export const MixedContentResolutionStatus = Schema.Literals([
   "MixedContentBlocked",
@@ -379,7 +426,6 @@ export const MixedContentResolutionStatus = Schema.Literals([
 ]).annotate({ identifier: "Audits.MixedContentResolutionStatus" });
 
 export const MixedContentResourceType = Schema.Literals([
-  "AttributionSrc",
   "Audio",
   "Beacon",
   "CSPReport",
@@ -465,6 +511,8 @@ export const PermissionElementIssueType = Schema.Literals([
   "FontSizeTooSmall",
   "FontSizeTooLarge",
   "InvalidSizeValue",
+  "NonSecureContext",
+  "MissingTransientUserActivation",
 ]).annotate({ identifier: "Audits.PermissionElementIssueType" });
 
 export const PermissionElementIssueDetails = Schema.Struct({
@@ -538,6 +586,7 @@ export const SharedDictionaryError = Schema.Literals([
   "WriteErrorNonSecureContext",
   "WriteErrorNonStringIdField",
   "WriteErrorNonStringInMatchDestList",
+  "WriteErrorInvalidMatchDestList",
   "WriteErrorNonStringMatchField",
   "WriteErrorNonTokenTypeField",
   "WriteErrorRequestAborted",
@@ -631,9 +680,6 @@ export const InspectorIssueDetails = Schema.Struct({
   ),
   sharedArrayBufferIssueDetails: Schema.optional(SharedArrayBufferIssueDetails),
   corsIssueDetails: Schema.optional(CorsIssueDetails),
-  attributionReportingIssueDetails: Schema.optional(
-    AttributionReportingIssueDetails,
-  ),
   quirksModeIssueDetails: Schema.optional(QuirksModeIssueDetails),
   partitioningBlobURLIssueDetails: Schema.optional(
     PartitioningBlobURLIssueDetails,
@@ -675,6 +721,10 @@ export const InspectorIssueDetails = Schema.Struct({
   selectivePermissionsInterventionIssueDetails: Schema.optional(
     SelectivePermissionsInterventionIssueDetails,
   ),
+  emailVerificationRequestIssueDetails: Schema.optional(
+    EmailVerificationRequestIssueDetails,
+  ),
+  lazyLoadImageIssueDetails: Schema.optional(LazyLoadImageIssueDetails),
 }).annotate({ identifier: "Audits.InspectorIssueDetails" });
 
 export const IssueId = Schema.String.annotate({ identifier: "Audits.IssueId" });
@@ -712,13 +762,13 @@ export const getEncodedResponse = {
   params: Schema.Struct({
     requestId: Network.RequestId,
     encoding: Schema.Literals(["webp", "jpeg", "png"]),
-    quality: Schema.optional(Schema.Number),
+    quality: Schema.optional(Schema.Finite),
     sizeOnly: Schema.optional(Schema.Boolean),
   }).annotate({ identifier: "Audits.getEncodedResponse.params" }),
   result: Schema.Struct({
     body: Schema.optional(Schema.String),
-    originalSize: Schema.Number,
-    encodedSize: Schema.Number,
+    originalSize: Schema.Int,
+    encodedSize: Schema.Int,
   }).annotate({ identifier: "Audits.getEncodedResponse.result" }),
 } as const;
 

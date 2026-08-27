@@ -14,6 +14,8 @@ export const AuthenticatorTransport = Schema.Literals([
   "nfc",
   "ble",
   "cable",
+  "hybrid",
+  "smart-card",
   "internal",
 ]).annotate({ identifier: "WebAuthn.AuthenticatorTransport" });
 
@@ -23,12 +25,15 @@ export const Credential = Schema.Struct({
   rpId: Schema.optional(Schema.String),
   privateKey: Schema.String,
   userHandle: Schema.optional(Schema.String),
-  signCount: Schema.Number,
+  signCount: Schema.Int,
   largeBlob: Schema.optional(Schema.String),
   backupEligibility: Schema.optional(Schema.Boolean),
   backupState: Schema.optional(Schema.Boolean),
   userName: Schema.optional(Schema.String),
   userDisplayName: Schema.optional(Schema.String),
+  cmtgKeys: Schema.optional(Schema.Array(Schema.String)),
+  activeCmtgKeyIndex: Schema.optional(Schema.Int),
+  generateCmtgKeyOnNextOperation: Schema.optional(Schema.Boolean),
 }).annotate({ identifier: "WebAuthn.Credential" });
 
 export const Ctap2Version = Schema.Literals([
@@ -49,6 +54,7 @@ export const VirtualAuthenticatorOptions = Schema.Struct({
   hasPrf: Schema.optional(Schema.Boolean),
   hasHmacSecret: Schema.optional(Schema.Boolean),
   hasHmacSecretMc: Schema.optional(Schema.Boolean),
+  hasCmtgKey: Schema.optional(Schema.Boolean),
   automaticPresenceSimulation: Schema.optional(Schema.Boolean),
   isUserVerified: Schema.optional(Schema.Boolean),
   defaultBackupEligibility: Schema.optional(Schema.Boolean),
@@ -160,6 +166,9 @@ export const setCredentialProperties = {
     credentialId: Schema.String,
     backupEligibility: Schema.optional(Schema.Boolean),
     backupState: Schema.optional(Schema.Boolean),
+    activeCmtgKeyIndex: Schema.optional(Schema.Int),
+    generateCmtgKeyOnNextOperation: Schema.optional(Schema.Boolean),
+    signCount: Schema.optional(Schema.Int),
   }).annotate({ identifier: "WebAuthn.setCredentialProperties.params" }),
   result: Schema.Struct({}).annotate({
     identifier: "WebAuthn.setCredentialProperties.result",

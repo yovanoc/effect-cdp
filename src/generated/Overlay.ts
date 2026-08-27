@@ -38,6 +38,25 @@ export const ContrastAlgorithm = Schema.Literals([
   "apca",
 ]).annotate({ identifier: "Overlay.ContrastAlgorithm" });
 
+export const DisplayCutoutShape = Schema.Literals([
+  "pill",
+  "notch",
+  "circle",
+  "rectangle",
+]).annotate({ identifier: "Overlay.DisplayCutoutShape" });
+
+export const DisplayCutoutConfig = Schema.Struct({
+  rect: DOM.Rect,
+  shape: DisplayCutoutShape,
+  borderRadius: Schema.optional(Schema.Int),
+  upperRadius: Schema.optional(Schema.Int),
+  lowerRadius: Schema.optional(Schema.Int),
+  cx: Schema.optional(Schema.Int),
+  cy: Schema.optional(Schema.Int),
+  radius: Schema.optional(Schema.Int),
+  contentColor: Schema.optional(DOM.RGBA),
+}).annotate({ identifier: "Overlay.DisplayCutoutConfig" });
+
 export const FlexContainerHighlightConfig = Schema.Struct({
   containerBorder: Schema.optional(LineStyle),
   lineSeparator: Schema.optional(LineStyle),
@@ -269,10 +288,10 @@ export const highlightQuad = {
 export const highlightRect = {
   method: "Overlay.highlightRect" as const,
   params: Schema.Struct({
-    x: Schema.Number,
-    y: Schema.Number,
-    width: Schema.Number,
-    height: Schema.Number,
+    x: Schema.Int,
+    y: Schema.Int,
+    width: Schema.Int,
+    height: Schema.Int,
     color: Schema.optional(DOM.RGBA),
     outlineColor: Schema.optional(DOM.RGBA),
   }).annotate({ identifier: "Overlay.highlightRect.params" }),
@@ -342,6 +361,16 @@ export const setShowDebugBorders = {
   }).annotate({ identifier: "Overlay.setShowDebugBorders.params" }),
   result: Schema.Struct({}).annotate({
     identifier: "Overlay.setShowDebugBorders.result",
+  }),
+} as const;
+
+export const setShowDisplayCutout = {
+  method: "Overlay.setShowDisplayCutout" as const,
+  params: Schema.Struct({
+    displayCutoutConfig: Schema.optional(DisplayCutoutConfig),
+  }).annotate({ identifier: "Overlay.setShowDisplayCutout.params" }),
+  result: Schema.Struct({}).annotate({
+    identifier: "Overlay.setShowDisplayCutout.result",
   }),
 } as const;
 

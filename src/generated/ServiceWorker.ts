@@ -11,8 +11,8 @@ export const ServiceWorkerErrorMessage = Schema.Struct({
   registrationId: RegistrationID,
   versionId: Schema.String,
   sourceURL: Schema.String,
-  lineNumber: Schema.Number,
-  columnNumber: Schema.Number,
+  lineNumber: Schema.Int,
+  columnNumber: Schema.Int,
 }).annotate({ identifier: "ServiceWorker.ServiceWorkerErrorMessage" });
 
 export const ServiceWorkerRegistration = Schema.Struct({
@@ -27,6 +27,38 @@ export const ServiceWorkerVersionRunningStatus = Schema.Literals([
   "running",
   "stopping",
 ]).annotate({ identifier: "ServiceWorker.ServiceWorkerVersionRunningStatus" });
+
+export const ServiceWorkerRouterCondition = Schema.Struct({
+  urlPattern: Schema.optional(Schema.String),
+  requestMethod: Schema.optional(Schema.String),
+  requestMode: Schema.optional(Schema.String),
+  requestDestination: Schema.optional(Schema.String),
+  runningStatus: Schema.optional(ServiceWorkerVersionRunningStatus),
+}).annotate({ identifier: "ServiceWorker.ServiceWorkerRouterCondition" });
+
+export const ServiceWorkerRouterSourceDict = Schema.Struct({
+  cacheName: Schema.String,
+}).annotate({ identifier: "ServiceWorker.ServiceWorkerRouterSourceDict" });
+
+export const ServiceWorkerRouterSourceType = Schema.Literals([
+  "cache",
+  "fetchEvent",
+  "network",
+  "raceNetworkAndFetchHandler",
+  "raceNetworkAndCache",
+  "sourceDict",
+]).annotate({ identifier: "ServiceWorker.ServiceWorkerRouterSourceType" });
+
+export const ServiceWorkerRouterSource = Schema.Struct({
+  type: ServiceWorkerRouterSourceType,
+  sourceDict: Schema.optional(ServiceWorkerRouterSourceDict),
+}).annotate({ identifier: "ServiceWorker.ServiceWorkerRouterSource" });
+
+export const ServiceWorkerRouterRule = Schema.Struct({
+  condition: ServiceWorkerRouterCondition,
+  source: ServiceWorkerRouterSource,
+  id: Schema.Int,
+}).annotate({ identifier: "ServiceWorker.ServiceWorkerRouterRule" });
 
 export const ServiceWorkerVersionStatus = Schema.Literals([
   "new",
@@ -43,11 +75,12 @@ export const ServiceWorkerVersion = Schema.Struct({
   scriptURL: Schema.String,
   runningStatus: ServiceWorkerVersionRunningStatus,
   status: ServiceWorkerVersionStatus,
-  scriptLastModified: Schema.optional(Schema.Number),
-  scriptResponseTime: Schema.optional(Schema.Number),
+  scriptLastModified: Schema.optional(Schema.Finite),
+  scriptResponseTime: Schema.optional(Schema.Finite),
   controlledClients: Schema.optional(Schema.Array(Target.TargetID)),
   targetId: Schema.optional(Target.TargetID),
   routerRules: Schema.optional(Schema.String),
+  typedRouterRules: Schema.optional(Schema.Array(ServiceWorkerRouterRule)),
 }).annotate({ identifier: "ServiceWorker.ServiceWorkerVersion" });
 
 export const deliverPushMessage = {

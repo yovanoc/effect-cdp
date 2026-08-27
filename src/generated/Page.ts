@@ -24,9 +24,9 @@ export const AdFrameStatus = Schema.Struct({
 
 export const AppManifestError = Schema.Struct({
   message: Schema.String,
-  critical: Schema.Number,
-  line: Schema.Number,
-  column: Schema.Number,
+  critical: Schema.Int,
+  line: Schema.Int,
+  column: Schema.Int,
 }).annotate({ identifier: "Page.AppManifestError" });
 
 export const AppManifestParsedProperties = Schema.Struct({
@@ -36,8 +36,8 @@ export const AppManifestParsedProperties = Schema.Struct({
 export const BackForwardCacheBlockingDetails = Schema.Struct({
   url: Schema.optional(Schema.String),
   function: Schema.optional(Schema.String),
-  lineNumber: Schema.Number,
-  columnNumber: Schema.Number,
+  lineNumber: Schema.Int,
+  columnNumber: Schema.Int,
 }).annotate({ identifier: "Page.BackForwardCacheBlockingDetails" });
 
 export const BackForwardCacheNotRestoredReason = Schema.Literals([
@@ -184,6 +184,7 @@ export const BackForwardCacheNotRestoredReason = Schema.Literals([
   "EmbedderExtensionMessagingForOpenPort",
   "EmbedderExtensionSentMessageToCachedFrame",
   "EmbedderExtensionFrame",
+  "EmbedderPrivilegedWebContents",
   "RequestedByWebViewClient",
   "PostMessageByWebViewClient",
   "CacheControlNoStoreDeviceBoundSessionTerminated",
@@ -265,16 +266,9 @@ export const FileFilter = Schema.Struct({
   accepts: Schema.optional(Schema.Array(Schema.String)),
 }).annotate({ identifier: "Page.FileFilter" });
 
-export const ImageResource = Schema.Struct({
-  url: Schema.String,
-  sizes: Schema.optional(Schema.String),
-  type: Schema.optional(Schema.String),
-}).annotate({ identifier: "Page.ImageResource" });
-
 export const FileHandler = Schema.Struct({
   action: Schema.String,
   name: Schema.String,
-  icons: Schema.optional(Schema.Array(ImageResource)),
   accepts: Schema.optional(Schema.Array(FileFilter)),
   launchType: Schema.String,
 }).annotate({ identifier: "Page.FileHandler" });
@@ -290,8 +284,8 @@ export const FontFamilies = Schema.Struct({
 }).annotate({ identifier: "Page.FontFamilies" });
 
 export const FontSizes = Schema.Struct({
-  standard: Schema.optional(Schema.Number),
-  fixed: Schema.optional(Schema.Number),
+  standard: Schema.optional(Schema.Int),
+  fixed: Schema.optional(Schema.Int),
 }).annotate({ identifier: "Page.FontSizes" });
 
 export const FrameId = Schema.String.annotate({ identifier: "Page.FrameId" });
@@ -337,7 +331,7 @@ export const FrameResource = Schema.Struct({
   type: Schema.suspend(() => Network.ResourceType),
   mimeType: Schema.String,
   lastModified: Schema.optional(Schema.suspend(() => Network.TimeSinceEpoch)),
-  contentSize: Schema.optional(Schema.Number),
+  contentSize: Schema.optional(Schema.Finite),
   failed: Schema.optional(Schema.Boolean),
   canceled: Schema.optional(Schema.Boolean),
 }).annotate({ identifier: "Page.FrameResource" });
@@ -371,6 +365,12 @@ export const FrameTree: Schema.Schema<PageFrameTreeType> = Schema.suspend(() =>
   }),
 ).annotate({ identifier: "Page.FrameTree" });
 
+export const ImageResource = Schema.Struct({
+  url: Schema.String,
+  sizes: Schema.optional(Schema.String),
+  type: Schema.optional(Schema.String),
+}).annotate({ identifier: "Page.ImageResource" });
+
 export const InstallabilityErrorArgument = Schema.Struct({
   name: Schema.String,
   value: Schema.String,
@@ -386,10 +386,10 @@ export const LaunchHandler = Schema.Struct({
 }).annotate({ identifier: "Page.LaunchHandler" });
 
 export const LayoutViewport = Schema.Struct({
-  pageX: Schema.Number,
-  pageY: Schema.Number,
-  clientWidth: Schema.Number,
-  clientHeight: Schema.Number,
+  pageX: Schema.Int,
+  pageY: Schema.Int,
+  clientWidth: Schema.Int,
+  clientHeight: Schema.Int,
 }).annotate({ identifier: "Page.LayoutViewport" });
 
 export const TransitionType = Schema.Literals([
@@ -409,7 +409,7 @@ export const TransitionType = Schema.Literals([
 ]).annotate({ identifier: "Page.TransitionType" });
 
 export const NavigationEntry = Schema.Struct({
-  id: Schema.Number,
+  id: Schema.Int,
   url: Schema.String,
   userTypedURL: Schema.String,
   title: Schema.String,
@@ -486,7 +486,6 @@ export const PermissionsPolicyFeature = Schema.Literals([
   "all-screens-capture",
   "ambient-light-sensor",
   "aria-notify",
-  "attribution-reporting",
   "autofill",
   "autoplay",
   "bluetooth",
@@ -529,7 +528,6 @@ export const PermissionsPolicyFeature = Schema.Literals([
   "digital-credentials-get",
   "direct-sockets",
   "direct-sockets-multicast",
-  "direct-sockets-private",
   "display-capture",
   "document-domain",
   "encrypted-media",
@@ -541,11 +539,11 @@ export const PermissionsPolicyFeature = Schema.Literals([
   "gamepad",
   "geolocation",
   "gyroscope",
+  "haptics",
   "hid",
   "identity-credentials-get",
   "idle-detection",
   "interest-cohort",
-  "join-ad-interest-group",
   "keyboard-map",
   "language-detector",
   "language-model",
@@ -562,14 +560,11 @@ export const PermissionsPolicyFeature = Schema.Literals([
   "otp-credentials",
   "payment",
   "picture-in-picture",
-  "private-aggregation",
   "private-state-token-issuance",
   "private-state-token-redemption",
   "publickey-credentials-create",
   "publickey-credentials-get",
-  "record-ad-auction-events",
   "rewriter",
-  "run-ad-auction",
   "screen-wake-lock",
   "serial",
   "shared-storage",
@@ -587,6 +582,7 @@ export const PermissionsPolicyFeature = Schema.Literals([
   "usb-unrestricted",
   "vertical-scroll",
   "web-app-installation",
+  "webnn",
   "web-printing",
   "web-share",
   "window-management",
@@ -627,12 +623,12 @@ export const ScopeExtension = Schema.Struct({
 }).annotate({ identifier: "Page.ScopeExtension" });
 
 export const ScreencastFrameMetadata = Schema.Struct({
-  offsetTop: Schema.Number,
-  pageScaleFactor: Schema.Number,
-  deviceWidth: Schema.Number,
-  deviceHeight: Schema.Number,
-  scrollOffsetX: Schema.Number,
-  scrollOffsetY: Schema.Number,
+  offsetTop: Schema.Finite,
+  pageScaleFactor: Schema.Finite,
+  deviceWidth: Schema.Finite,
+  deviceHeight: Schema.Finite,
+  scrollOffsetX: Schema.Finite,
+  scrollOffsetY: Schema.Finite,
   timestamp: Schema.optional(Schema.suspend(() => Network.TimeSinceEpoch)),
 }).annotate({ identifier: "Page.ScreencastFrameMetadata" });
 
@@ -667,22 +663,22 @@ export const Shortcut = Schema.Struct({
 }).annotate({ identifier: "Page.Shortcut" });
 
 export const Viewport = Schema.Struct({
-  x: Schema.Number,
-  y: Schema.Number,
-  width: Schema.Number,
-  height: Schema.Number,
-  scale: Schema.Number,
+  x: Schema.Finite,
+  y: Schema.Finite,
+  width: Schema.Finite,
+  height: Schema.Finite,
+  scale: Schema.Finite,
 }).annotate({ identifier: "Page.Viewport" });
 
 export const VisualViewport = Schema.Struct({
-  offsetX: Schema.Number,
-  offsetY: Schema.Number,
-  pageX: Schema.Number,
-  pageY: Schema.Number,
-  clientWidth: Schema.Number,
-  clientHeight: Schema.Number,
-  scale: Schema.Number,
-  zoom: Schema.optional(Schema.Number),
+  offsetX: Schema.Finite,
+  offsetY: Schema.Finite,
+  pageX: Schema.Finite,
+  pageY: Schema.Finite,
+  clientWidth: Schema.Finite,
+  clientHeight: Schema.Finite,
+  scale: Schema.Finite,
+  zoom: Schema.optional(Schema.Finite),
 }).annotate({ identifier: "Page.VisualViewport" });
 
 export const WebAppManifest = Schema.Struct({
@@ -769,7 +765,7 @@ export const captureScreenshot = {
   method: "Page.captureScreenshot" as const,
   params: Schema.Struct({
     format: Schema.optional(Schema.Literals(["jpeg", "png", "webp"])),
-    quality: Schema.optional(Schema.Number),
+    quality: Schema.optional(Schema.Int),
     clip: Schema.optional(Viewport),
     /** @experimental Capture the screenshot from the surface, rather than the view. Defaults to true. */
     fromSurface: Schema.optional(Schema.Boolean),
@@ -858,6 +854,7 @@ export const createIsolatedWorld = {
     frameId: FrameId,
     worldName: Schema.optional(Schema.String),
     grantUniveralAccess: Schema.optional(Schema.Boolean),
+    contentSecurityPolicy: Schema.optional(Schema.String),
   }).annotate({ identifier: "Page.createIsolatedWorld.params" }),
   result: Schema.Struct({
     executionContextId: Runtime.ExecutionContextId,
@@ -1010,7 +1007,7 @@ export const getNavigationHistory = {
     identifier: "Page.getNavigationHistory.params",
   }),
   result: Schema.Struct({
-    currentIndex: Schema.Number,
+    currentIndex: Schema.Int,
     entries: Schema.Array(NavigationEntry),
   }).annotate({ identifier: "Page.getNavigationHistory.result" }),
 } as const;
@@ -1094,7 +1091,7 @@ export const navigate = {
 export const navigateToHistoryEntry = {
   method: "Page.navigateToHistoryEntry" as const,
   params: Schema.Struct({
-    entryId: Schema.Number,
+    entryId: Schema.Int,
   }).annotate({ identifier: "Page.navigateToHistoryEntry.params" }),
   result: Schema.Struct({}).annotate({
     identifier: "Page.navigateToHistoryEntry.result",
@@ -1107,13 +1104,13 @@ export const printToPDF = {
     landscape: Schema.optional(Schema.Boolean),
     displayHeaderFooter: Schema.optional(Schema.Boolean),
     printBackground: Schema.optional(Schema.Boolean),
-    scale: Schema.optional(Schema.Number),
-    paperWidth: Schema.optional(Schema.Number),
-    paperHeight: Schema.optional(Schema.Number),
-    marginTop: Schema.optional(Schema.Number),
-    marginBottom: Schema.optional(Schema.Number),
-    marginLeft: Schema.optional(Schema.Number),
-    marginRight: Schema.optional(Schema.Number),
+    scale: Schema.optional(Schema.Finite),
+    paperWidth: Schema.optional(Schema.Finite),
+    paperHeight: Schema.optional(Schema.Finite),
+    marginTop: Schema.optional(Schema.Finite),
+    marginBottom: Schema.optional(Schema.Finite),
+    marginLeft: Schema.optional(Schema.Finite),
+    marginRight: Schema.optional(Schema.Finite),
     pageRanges: Schema.optional(Schema.String),
     headerTemplate: Schema.optional(Schema.String),
     footerTemplate: Schema.optional(Schema.String),
@@ -1200,7 +1197,7 @@ export const resetNavigationHistory = {
 export const screencastFrameAck = {
   method: "Page.screencastFrameAck" as const,
   params: Schema.Struct({
-    sessionId: Schema.Number,
+    sessionId: Schema.Int,
   }).annotate({ identifier: "Page.screencastFrameAck.params" }),
   result: Schema.Struct({}).annotate({
     identifier: "Page.screencastFrameAck.result",
@@ -1249,15 +1246,15 @@ query results). */
 export const setDeviceMetricsOverride = {
   method: "Page.setDeviceMetricsOverride" as const,
   params: Schema.Struct({
-    width: Schema.Number,
-    height: Schema.Number,
-    deviceScaleFactor: Schema.Number,
+    width: Schema.Int,
+    height: Schema.Int,
+    deviceScaleFactor: Schema.Finite,
     mobile: Schema.Boolean,
-    scale: Schema.optional(Schema.Number),
-    screenWidth: Schema.optional(Schema.Number),
-    screenHeight: Schema.optional(Schema.Number),
-    positionX: Schema.optional(Schema.Number),
-    positionY: Schema.optional(Schema.Number),
+    scale: Schema.optional(Schema.Finite),
+    screenWidth: Schema.optional(Schema.Int),
+    screenHeight: Schema.optional(Schema.Int),
+    positionX: Schema.optional(Schema.Int),
+    positionY: Schema.optional(Schema.Int),
     dontSetVisibleSize: Schema.optional(Schema.Boolean),
     screenOrientation: Schema.optional(
       Schema.suspend(() => Emulation.ScreenOrientation),
@@ -1273,9 +1270,9 @@ export const setDeviceMetricsOverride = {
 export const setDeviceOrientationOverride = {
   method: "Page.setDeviceOrientationOverride" as const,
   params: Schema.Struct({
-    alpha: Schema.Number,
-    beta: Schema.Number,
-    gamma: Schema.Number,
+    alpha: Schema.Finite,
+    beta: Schema.Finite,
+    gamma: Schema.Finite,
   }).annotate({ identifier: "Page.setDeviceOrientationOverride.params" }),
   result: Schema.Struct({}).annotate({
     identifier: "Page.setDeviceOrientationOverride.result",
@@ -1333,9 +1330,9 @@ unavailable. */
 export const setGeolocationOverride = {
   method: "Page.setGeolocationOverride" as const,
   params: Schema.Struct({
-    latitude: Schema.optional(Schema.Number),
-    longitude: Schema.optional(Schema.Number),
-    accuracy: Schema.optional(Schema.Number),
+    latitude: Schema.optional(Schema.Finite),
+    longitude: Schema.optional(Schema.Finite),
+    accuracy: Schema.optional(Schema.Finite),
   }).annotate({ identifier: "Page.setGeolocationOverride.params" }),
   result: Schema.Struct({}).annotate({
     identifier: "Page.setGeolocationOverride.result",
@@ -1443,14 +1440,31 @@ export const startScreencast = {
   method: "Page.startScreencast" as const,
   params: Schema.Struct({
     format: Schema.optional(Schema.Literals(["jpeg", "png"])),
-    quality: Schema.optional(Schema.Number),
-    maxWidth: Schema.optional(Schema.Number),
-    maxHeight: Schema.optional(Schema.Number),
-    everyNthFrame: Schema.optional(Schema.Number),
+    quality: Schema.optional(Schema.Int),
+    maxWidth: Schema.optional(Schema.Int),
+    maxHeight: Schema.optional(Schema.Int),
+    everyNthFrame: Schema.optional(Schema.Int),
+    maxFramesInFlight: Schema.optional(Schema.Int),
+    sendLastFrame: Schema.optional(Schema.Boolean),
   }).annotate({ identifier: "Page.startScreencast.params" }),
   result: Schema.Struct({}).annotate({
     identifier: "Page.startScreencast.result",
   }),
+} as const;
+
+/** @experimental Starts screencast video recording. */
+export const startScreenRecording = {
+  method: "Page.startScreenRecording" as const,
+  params: Schema.Struct({
+    audio: Schema.optional(Schema.Boolean),
+    maxWidth: Schema.optional(Schema.Int),
+    maxHeight: Schema.optional(Schema.Int),
+    frameRate: Schema.optional(Schema.Int),
+  }).annotate({ identifier: "Page.startScreenRecording.params" }),
+  result: Schema.Struct({
+    /** @experimental A handle of the stream that holds resulting screencast data. */
+    stream: IO.StreamHandle,
+  }).annotate({ identifier: "Page.startScreenRecording.result" }),
 } as const;
 
 export const stopLoading = {
@@ -1468,6 +1482,18 @@ export const stopScreencast = {
   result: Schema.Struct({}).annotate({
     identifier: "Page.stopScreencast.result",
   }),
+} as const;
+
+/** @experimental Stops screencast video recording. */
+export const stopScreenRecording = {
+  method: "Page.stopScreenRecording" as const,
+  params: Schema.Struct({}).annotate({
+    identifier: "Page.stopScreenRecording.params",
+  }),
+  result: Schema.Struct({
+    /** @experimental A handle of the stream that holds resulting screencast data. */
+    stream: IO.StreamHandle,
+  }).annotate({ identifier: "Page.stopScreenRecording.result" }),
 } as const;
 
 /** @experimental Pauses page execution. Can be resumed using generic Runtime.runIfWaitingForDebugger. */
@@ -1529,8 +1555,8 @@ export const downloadProgress = {
   method: "Page.downloadProgress" as const,
   params: Schema.Struct({
     guid: Schema.String,
-    totalBytes: Schema.Number,
-    receivedBytes: Schema.Number,
+    totalBytes: Schema.Finite,
+    receivedBytes: Schema.Finite,
     state: Schema.Literals(["inProgress", "completed", "canceled"]),
   }).annotate({ identifier: "Page.downloadProgress.params" }),
 } as const;
@@ -1618,7 +1644,7 @@ export const frameScheduledNavigation = {
   method: "Page.frameScheduledNavigation" as const,
   params: Schema.Struct({
     frameId: FrameId,
-    delay: Schema.Number,
+    delay: Schema.Finite,
     reason: ClientNavigationReason,
     url: Schema.String,
   }).annotate({ identifier: "Page.frameScheduledNavigation.params" }),
@@ -1745,7 +1771,7 @@ export const screencastFrame = {
   params: Schema.Struct({
     data: Schema.String,
     metadata: ScreencastFrameMetadata,
-    sessionId: Schema.Number,
+    sessionId: Schema.Int,
   }).annotate({ identifier: "Page.screencastFrame.params" }),
 } as const;
 

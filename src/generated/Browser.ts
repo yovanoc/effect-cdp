@@ -11,10 +11,10 @@ export const WindowState = Schema.Literals([
 ]).annotate({ identifier: "Browser.WindowState" });
 
 export const Bounds = Schema.Struct({
-  left: Schema.optional(Schema.Number),
-  top: Schema.optional(Schema.Number),
-  width: Schema.optional(Schema.Number),
-  height: Schema.optional(Schema.Number),
+  left: Schema.optional(Schema.Int),
+  top: Schema.optional(Schema.Int),
+  width: Schema.optional(Schema.Int),
+  height: Schema.optional(Schema.Int),
   windowState: Schema.optional(WindowState),
 }).annotate({ identifier: "Browser.Bounds" });
 
@@ -29,15 +29,15 @@ export const BrowserContextID = Schema.String.annotate({
 });
 
 export const Bucket = Schema.Struct({
-  low: Schema.Number,
-  high: Schema.Number,
-  count: Schema.Number,
+  low: Schema.Int,
+  high: Schema.Int,
+  count: Schema.Int,
 }).annotate({ identifier: "Browser.Bucket" });
 
 export const Histogram = Schema.Struct({
   name: Schema.String,
-  sum: Schema.Number,
-  count: Schema.Number,
+  sum: Schema.Int,
+  count: Schema.Int,
   buckets: Schema.Array(Bucket),
 }).annotate({ identifier: "Browser.Histogram" });
 
@@ -98,27 +98,18 @@ export const PermissionType = Schema.Literals([
   "windowManagement",
 ]).annotate({ identifier: "Browser.PermissionType" });
 
-export const PrivacySandboxAPI = Schema.Literals([
-  "BiddingAndAuctionServices",
-  "TrustedKeyValue",
-]).annotate({ identifier: "Browser.PrivacySandboxAPI" });
+export const WindowID = Schema.Int.annotate({ identifier: "Browser.WindowID" });
 
-export const WindowID = Schema.Number.annotate({
-  identifier: "Browser.WindowID",
-});
-
-export const addPrivacySandboxCoordinatorKeyConfig = {
-  method: "Browser.addPrivacySandboxCoordinatorKeyConfig" as const,
+/** @experimental Adds or updates a mock camera in the shared video capture device list for
+test automation. The mock camera is not scoped to a particular page or
+frame and is removed when the DevTools session that created it disconnects. */
+export const addMockCamera = {
+  method: "Browser.addMockCamera" as const,
   params: Schema.Struct({
-    api: PrivacySandboxAPI,
-    coordinatorOrigin: Schema.String,
-    keyConfig: Schema.String,
-    browserContextId: Schema.optional(BrowserContextID),
-  }).annotate({
-    identifier: "Browser.addPrivacySandboxCoordinatorKeyConfig.params",
-  }),
+    deviceId: Schema.String,
+  }).annotate({ identifier: "Browser.addMockCamera.params" }),
   result: Schema.Struct({}).annotate({
-    identifier: "Browser.addPrivacySandboxCoordinatorKeyConfig.result",
+    identifier: "Browser.addMockCamera.result",
   }),
 } as const;
 
@@ -191,6 +182,18 @@ export const getBrowserCommandLine = {
   result: Schema.Struct({
     arguments: Schema.Array(Schema.String),
   }).annotate({ identifier: "Browser.getBrowserCommandLine.result" }),
+} as const;
+
+/** @experimental Gets the current globally-applied privacy control status
+See https://www.w3.org/TR/gpc/#get-global-privacy-control */
+export const getGlobalPrivacyControl = {
+  method: "Browser.getGlobalPrivacyControl" as const,
+  params: Schema.Struct({}).annotate({
+    identifier: "Browser.getGlobalPrivacyControl.params",
+  }),
+  result: Schema.Struct({
+    gpc: Schema.Boolean,
+  }).annotate({ identifier: "Browser.getGlobalPrivacyControl.result" }),
 } as const;
 
 /** @experimental Get a Chrome histogram by name. */
@@ -283,8 +286,8 @@ export const setContentsSize = {
   method: "Browser.setContentsSize" as const,
   params: Schema.Struct({
     windowId: WindowID,
-    width: Schema.optional(Schema.Number),
-    height: Schema.optional(Schema.Number),
+    width: Schema.optional(Schema.Int),
+    height: Schema.optional(Schema.Int),
   }).annotate({ identifier: "Browser.setContentsSize.params" }),
   result: Schema.Struct({}).annotate({
     identifier: "Browser.setContentsSize.result",
@@ -315,6 +318,18 @@ export const setDownloadBehavior = {
   result: Schema.Struct({}).annotate({
     identifier: "Browser.setDownloadBehavior.result",
   }),
+} as const;
+
+/** @experimental Sets and then gets the current globally-applied privacy control status
+See https://www.w3.org/TR/gpc/#set-global-privacy-control */
+export const setGlobalPrivacyControl = {
+  method: "Browser.setGlobalPrivacyControl" as const,
+  params: Schema.Struct({
+    gpc: Schema.Boolean,
+  }).annotate({ identifier: "Browser.setGlobalPrivacyControl.params" }),
+  result: Schema.Struct({
+    gpc: Schema.Boolean,
+  }).annotate({ identifier: "Browser.setGlobalPrivacyControl.result" }),
 } as const;
 
 /** @experimental Set permission settings for given embedding and embedded origins. */
@@ -349,8 +364,8 @@ export const downloadProgress = {
   method: "Browser.downloadProgress" as const,
   params: Schema.Struct({
     guid: Schema.String,
-    totalBytes: Schema.Number,
-    receivedBytes: Schema.Number,
+    totalBytes: Schema.Finite,
+    receivedBytes: Schema.Finite,
     state: Schema.Literals(["inProgress", "completed", "canceled"]),
     /** @experimental If download is "completed", provides the path of the downloaded file.
     Depending on the platform, it is not guaranteed to be set, nor the file

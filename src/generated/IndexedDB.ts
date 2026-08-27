@@ -25,7 +25,7 @@ export const ObjectStore = Schema.Struct({
 
 export const DatabaseWithObjectStores = Schema.Struct({
   name: Schema.String,
-  version: Schema.Number,
+  version: Schema.Finite,
   objectStores: Schema.Array(ObjectStore),
 }).annotate({ identifier: "IndexedDB.DatabaseWithObjectStores" });
 
@@ -45,9 +45,9 @@ export interface IndexedDBKeyType {
 export const Key: Schema.Schema<IndexedDBKeyType> = Schema.suspend(() =>
   Schema.Struct({
     type: Schema.Literals(["number", "string", "date", "array"]),
-    number: Schema.optional(Schema.Number),
+    number: Schema.optional(Schema.Finite),
     string: Schema.optional(Schema.String),
-    date: Schema.optional(Schema.Number),
+    date: Schema.optional(Schema.Finite),
     array: Schema.optional(Schema.Array(Key)),
   }),
 ).annotate({ identifier: "IndexedDB.Key" });
@@ -127,8 +127,8 @@ export const getMetadata = {
     objectStoreName: Schema.String,
   }).annotate({ identifier: "IndexedDB.getMetadata.params" }),
   result: Schema.Struct({
-    entriesCount: Schema.Number,
-    keyGeneratorValue: Schema.Number,
+    entriesCount: Schema.Finite,
+    keyGeneratorValue: Schema.Finite,
   }).annotate({ identifier: "IndexedDB.getMetadata.result" }),
 } as const;
 
@@ -141,8 +141,8 @@ export const requestData = {
     databaseName: Schema.String,
     objectStoreName: Schema.String,
     indexName: Schema.optional(Schema.String),
-    skipCount: Schema.Number,
-    pageSize: Schema.Number,
+    skipCount: Schema.Int,
+    pageSize: Schema.Int,
     keyRange: Schema.optional(KeyRange),
   }).annotate({ identifier: "IndexedDB.requestData.params" }),
   result: Schema.Struct({

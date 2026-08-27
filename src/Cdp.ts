@@ -129,7 +129,7 @@ export class Cdp extends Context.Service<Cdp, CdpService>()("Cdp", {
       ).pipe(Effect.mapError(decodeError(rawResult)));
     });
 
-    const allEvents = connection.eventBus.subscribe();
+    const allEvents = connection.eventBus.subscribe;
 
     const root: CdpSession = {
       send: (cmd, params, opts) => sendCommand(cmd, params, opts),
@@ -180,36 +180,34 @@ export class Cdp extends Context.Service<Cdp, CdpService>()("Cdp", {
   static readonly layerNode = (
     config: typeof CdpConfig.Type,
   ): Layer.Layer<Cdp, never, never> =>
-    Layer.effect(
-      Cdp,
-      Effect.gen(function* () {
-        const { NodeSocket } = yield* Effect.promise<_NodePlatform>(
-          () => import(_modNode),
-        );
-        return yield* Cdp.make().pipe(
-          Effect.provide(
-            CdpConnection.layer(config, NodeSocket.layerWebSocketConstructor),
+    Layer.unwrap(
+      Effect.promise<_NodePlatform>(() => import(_modNode)).pipe(
+        Effect.map(({ NodeSocket }) =>
+          Layer.effect(Cdp, Cdp.make()).pipe(
+            Layer.provide(
+              CdpConnection.layer(config, NodeSocket.layerWebSocketConstructor),
+            ),
+            Layer.orDie,
           ),
-        );
-      }),
-    ).pipe(Layer.orDie);
+        ),
+      ),
+    );
 
   static readonly layerBun = (
     config: typeof CdpConfig.Type,
   ): Layer.Layer<Cdp, never, never> =>
-    Layer.effect(
-      Cdp,
-      Effect.gen(function* () {
-        const { BunSocket } = yield* Effect.promise<_BunPlatform>(
-          () => import(_modBun),
-        );
-        return yield* Cdp.make().pipe(
-          Effect.provide(
-            CdpConnection.layer(config, BunSocket.layerWebSocketConstructor),
+    Layer.unwrap(
+      Effect.promise<_BunPlatform>(() => import(_modBun)).pipe(
+        Effect.map(({ BunSocket }) =>
+          Layer.effect(Cdp, Cdp.make()).pipe(
+            Layer.provide(
+              CdpConnection.layer(config, BunSocket.layerWebSocketConstructor),
+            ),
+            Layer.orDie,
           ),
-        );
-      }),
-    ).pipe(Layer.orDie);
+        ),
+      ),
+    );
 }
 
 export type { RawCdpEvent };

@@ -24,7 +24,7 @@ export const PlayerError: Schema.Schema<MediaPlayerErrorType> = Schema.suspend(
   () =>
     Schema.Struct({
       errorType: Schema.String,
-      code: Schema.Number,
+      code: Schema.Int,
       stack: Schema.Array(PlayerErrorSourceLocation),
       cause: Schema.Array(PlayerError),
       data: Schema.Json,
@@ -33,10 +33,10 @@ export const PlayerError: Schema.Schema<MediaPlayerErrorType> = Schema.suspend(
 
 export const PlayerErrorSourceLocation = Schema.Struct({
   file: Schema.String,
-  line: Schema.Number,
+  line: Schema.Int,
 }).annotate({ identifier: "Media.PlayerErrorSourceLocation" });
 
-export const Timestamp = Schema.Number.annotate({
+export const Timestamp = Schema.Finite.annotate({
   identifier: "Media.Timestamp",
 });
 

@@ -20,8 +20,8 @@ export const EventListener = Schema.Struct({
   passive: Schema.Boolean,
   once: Schema.Boolean,
   scriptId: Runtime.ScriptId,
-  lineNumber: Schema.Number,
-  columnNumber: Schema.Number,
+  lineNumber: Schema.Int,
+  columnNumber: Schema.Int,
   handler: Schema.optional(Runtime.RemoteObject),
   originalHandler: Schema.optional(Runtime.RemoteObject),
   backendNodeId: Schema.optional(DOM.BackendNodeId),
@@ -31,7 +31,7 @@ export const getEventListeners = {
   method: "DOMDebugger.getEventListeners" as const,
   params: Schema.Struct({
     objectId: Runtime.RemoteObjectId,
-    depth: Schema.optional(Schema.Number),
+    depth: Schema.optional(Schema.Int),
     pierce: Schema.optional(Schema.Boolean),
   }).annotate({ identifier: "DOMDebugger.getEventListeners.params" }),
   result: Schema.Struct({

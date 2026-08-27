@@ -16,8 +16,8 @@ export const DisabledImageType = Schema.Literals([
 
 export const DisplayFeature = Schema.Struct({
   orientation: Schema.Literals(["vertical", "horizontal"]),
-  offset: Schema.Number,
-  maskLength: Schema.Number,
+  offset: Schema.Int,
+  maskLength: Schema.Int,
 }).annotate({ identifier: "Emulation.DisplayFeature" });
 
 export const MediaFeature = Schema.Struct({
@@ -41,14 +41,14 @@ export const PressureState = Schema.Literals([
 ]).annotate({ identifier: "Emulation.PressureState" });
 
 export const SafeAreaInsets = Schema.Struct({
-  top: Schema.optional(Schema.Number),
-  topMax: Schema.optional(Schema.Number),
-  left: Schema.optional(Schema.Number),
-  leftMax: Schema.optional(Schema.Number),
-  bottom: Schema.optional(Schema.Number),
-  bottomMax: Schema.optional(Schema.Number),
-  right: Schema.optional(Schema.Number),
-  rightMax: Schema.optional(Schema.Number),
+  top: Schema.optional(Schema.Int),
+  topMax: Schema.optional(Schema.Int),
+  left: Schema.optional(Schema.Int),
+  leftMax: Schema.optional(Schema.Int),
+  bottom: Schema.optional(Schema.Int),
+  bottomMax: Schema.optional(Schema.Int),
+  right: Schema.optional(Schema.Int),
+  rightMax: Schema.optional(Schema.Int),
 }).annotate({ identifier: "Emulation.SafeAreaInsets" });
 
 export const ScreenId = Schema.String.annotate({
@@ -62,21 +62,21 @@ export const ScreenOrientation = Schema.Struct({
     "landscapePrimary",
     "landscapeSecondary",
   ]),
-  angle: Schema.Number,
+  angle: Schema.Int,
 }).annotate({ identifier: "Emulation.ScreenOrientation" });
 
 export const ScreenInfo = Schema.Struct({
-  left: Schema.Number,
-  top: Schema.Number,
-  width: Schema.Number,
-  height: Schema.Number,
-  availLeft: Schema.Number,
-  availTop: Schema.Number,
-  availWidth: Schema.Number,
-  availHeight: Schema.Number,
-  devicePixelRatio: Schema.Number,
+  left: Schema.Int,
+  top: Schema.Int,
+  width: Schema.Int,
+  height: Schema.Int,
+  availLeft: Schema.Int,
+  availTop: Schema.Int,
+  availWidth: Schema.Int,
+  availHeight: Schema.Int,
+  devicePixelRatio: Schema.Finite,
   orientation: ScreenOrientation,
-  colorDepth: Schema.Number,
+  colorDepth: Schema.Int,
   isExtended: Schema.Boolean,
   isInternal: Schema.Boolean,
   isPrimary: Schema.Boolean,
@@ -86,25 +86,25 @@ export const ScreenInfo = Schema.Struct({
 
 export const SensorMetadata = Schema.Struct({
   available: Schema.optional(Schema.Boolean),
-  minimumFrequency: Schema.optional(Schema.Number),
-  maximumFrequency: Schema.optional(Schema.Number),
+  minimumFrequency: Schema.optional(Schema.Finite),
+  maximumFrequency: Schema.optional(Schema.Finite),
 }).annotate({ identifier: "Emulation.SensorMetadata" });
 
 export const SensorReadingQuaternion = Schema.Struct({
-  x: Schema.Number,
-  y: Schema.Number,
-  z: Schema.Number,
-  w: Schema.Number,
+  x: Schema.Finite,
+  y: Schema.Finite,
+  z: Schema.Finite,
+  w: Schema.Finite,
 }).annotate({ identifier: "Emulation.SensorReadingQuaternion" });
 
 export const SensorReadingSingle = Schema.Struct({
-  value: Schema.Number,
+  value: Schema.Finite,
 }).annotate({ identifier: "Emulation.SensorReadingSingle" });
 
 export const SensorReadingXYZ = Schema.Struct({
-  x: Schema.Number,
-  y: Schema.Number,
-  z: Schema.Number,
+  x: Schema.Finite,
+  y: Schema.Finite,
+  z: Schema.Finite,
 }).annotate({ identifier: "Emulation.SensorReadingXYZ" });
 
 export const SensorReading = Schema.Struct({
@@ -150,24 +150,24 @@ export const VirtualTimePolicy = Schema.Literals([
 ]).annotate({ identifier: "Emulation.VirtualTimePolicy" });
 
 export const WorkAreaInsets = Schema.Struct({
-  top: Schema.optional(Schema.Number),
-  left: Schema.optional(Schema.Number),
-  bottom: Schema.optional(Schema.Number),
-  right: Schema.optional(Schema.Number),
+  top: Schema.optional(Schema.Int),
+  left: Schema.optional(Schema.Int),
+  bottom: Schema.optional(Schema.Int),
+  right: Schema.optional(Schema.Int),
 }).annotate({ identifier: "Emulation.WorkAreaInsets" });
 
 /** @experimental Add a new screen to the device. Only supported in headless mode. */
 export const addScreen = {
   method: "Emulation.addScreen" as const,
   params: Schema.Struct({
-    left: Schema.Number,
-    top: Schema.Number,
-    width: Schema.Number,
-    height: Schema.Number,
+    left: Schema.Int,
+    top: Schema.Int,
+    width: Schema.Int,
+    height: Schema.Int,
     workAreaInsets: Schema.optional(WorkAreaInsets),
-    devicePixelRatio: Schema.optional(Schema.Number),
-    rotation: Schema.optional(Schema.Number),
-    colorDepth: Schema.optional(Schema.Number),
+    devicePixelRatio: Schema.optional(Schema.Finite),
+    rotation: Schema.optional(Schema.Int),
+    colorDepth: Schema.optional(Schema.Int),
     label: Schema.optional(Schema.String),
     isInternal: Schema.optional(Schema.Boolean),
   }).annotate({ identifier: "Emulation.addScreen.params" }),
@@ -254,7 +254,7 @@ export const getOverriddenSensorInformation = {
     identifier: "Emulation.getOverriddenSensorInformation.params",
   }),
   result: Schema.Struct({
-    requestedSamplingFrequency: Schema.Number,
+    requestedSamplingFrequency: Schema.Finite,
   }).annotate({
     identifier: "Emulation.getOverriddenSensorInformation.result",
   }),
@@ -316,10 +316,23 @@ export const setAutomationOverride = {
   }),
 } as const;
 
+/** @experimental Overrides the value of navigator.cpuPerformance */
+export const setCPUPerformanceOverride = {
+  method: "Emulation.setCPUPerformanceOverride" as const,
+  params: Schema.Struct({
+    performanceTier: Schema.optional(
+      Schema.Literals(["unknown", "low", "mid", "high", "ultra"]),
+    ),
+  }).annotate({ identifier: "Emulation.setCPUPerformanceOverride.params" }),
+  result: Schema.Struct({}).annotate({
+    identifier: "Emulation.setCPUPerformanceOverride.result",
+  }),
+} as const;
+
 export const setCPUThrottlingRate = {
   method: "Emulation.setCPUThrottlingRate" as const,
   params: Schema.Struct({
-    rate: Schema.Number,
+    rate: Schema.Finite,
   }).annotate({ identifier: "Emulation.setCPUThrottlingRate.params" }),
   result: Schema.Struct({}).annotate({
     identifier: "Emulation.setCPUThrottlingRate.result",
@@ -352,20 +365,20 @@ export const setDefaultBackgroundColorOverride = {
 export const setDeviceMetricsOverride = {
   method: "Emulation.setDeviceMetricsOverride" as const,
   params: Schema.Struct({
-    width: Schema.Number,
-    height: Schema.Number,
-    deviceScaleFactor: Schema.Number,
+    width: Schema.Int,
+    height: Schema.Int,
+    deviceScaleFactor: Schema.Finite,
     mobile: Schema.Boolean,
     /** @experimental Scale to apply to resulting view image. */
-    scale: Schema.optional(Schema.Number),
+    scale: Schema.optional(Schema.Finite),
     /** @experimental Overriding screen width value in pixels (minimum 0, maximum 10000000). */
-    screenWidth: Schema.optional(Schema.Number),
+    screenWidth: Schema.optional(Schema.Int),
     /** @experimental Overriding screen height value in pixels (minimum 0, maximum 10000000). */
-    screenHeight: Schema.optional(Schema.Number),
+    screenHeight: Schema.optional(Schema.Int),
     /** @experimental Overriding view X position on screen in pixels (minimum 0, maximum 10000000). */
-    positionX: Schema.optional(Schema.Number),
+    positionX: Schema.optional(Schema.Int),
     /** @experimental Overriding view Y position on screen in pixels (minimum 0, maximum 10000000). */
-    positionY: Schema.optional(Schema.Number),
+    positionY: Schema.optional(Schema.Int),
     /** @experimental Do not set visible view size, rely upon explicit setVisibleSize call. */
     dontSetVisibleSize: Schema.optional(Schema.Boolean),
     screenOrientation: Schema.optional(ScreenOrientation),
@@ -466,7 +479,7 @@ export const setEmulatedMedia = {
 export const setEmulatedOSTextScale = {
   method: "Emulation.setEmulatedOSTextScale" as const,
   params: Schema.Struct({
-    scale: Schema.optional(Schema.Number),
+    scale: Schema.optional(Schema.Finite),
   }).annotate({ identifier: "Emulation.setEmulatedOSTextScale.params" }),
   result: Schema.Struct({}).annotate({
     identifier: "Emulation.setEmulatedOSTextScale.result",
@@ -505,13 +518,13 @@ export const setFocusEmulationEnabled = {
 export const setGeolocationOverride = {
   method: "Emulation.setGeolocationOverride" as const,
   params: Schema.Struct({
-    latitude: Schema.optional(Schema.Number),
-    longitude: Schema.optional(Schema.Number),
-    accuracy: Schema.optional(Schema.Number),
-    altitude: Schema.optional(Schema.Number),
-    altitudeAccuracy: Schema.optional(Schema.Number),
-    heading: Schema.optional(Schema.Number),
-    speed: Schema.optional(Schema.Number),
+    latitude: Schema.optional(Schema.Finite),
+    longitude: Schema.optional(Schema.Finite),
+    accuracy: Schema.optional(Schema.Finite),
+    altitude: Schema.optional(Schema.Finite),
+    altitudeAccuracy: Schema.optional(Schema.Finite),
+    heading: Schema.optional(Schema.Finite),
+    speed: Schema.optional(Schema.Finite),
   }).annotate({ identifier: "Emulation.setGeolocationOverride.params" }),
   result: Schema.Struct({}).annotate({
     identifier: "Emulation.setGeolocationOverride.result",
@@ -522,7 +535,7 @@ export const setGeolocationOverride = {
 export const setHardwareConcurrencyOverride = {
   method: "Emulation.setHardwareConcurrencyOverride" as const,
   params: Schema.Struct({
-    hardwareConcurrency: Schema.Number,
+    hardwareConcurrency: Schema.Int,
   }).annotate({
     identifier: "Emulation.setHardwareConcurrencyOverride.params",
   }),
@@ -568,25 +581,10 @@ export const setNavigatorOverrides = {
 export const setPageScaleFactor = {
   method: "Emulation.setPageScaleFactor" as const,
   params: Schema.Struct({
-    pageScaleFactor: Schema.Number,
+    pageScaleFactor: Schema.Finite,
   }).annotate({ identifier: "Emulation.setPageScaleFactor.params" }),
   result: Schema.Struct({}).annotate({
     identifier: "Emulation.setPageScaleFactor.result",
-  }),
-} as const;
-
-/** @experimental Provides a given pressure data set that will be processed and eventually be
-delivered to PressureObserver users. |source| must have been previously
-overridden by setPressureSourceOverrideEnabled. */
-export const setPressureDataOverride = {
-  method: "Emulation.setPressureDataOverride" as const,
-  params: Schema.Struct({
-    source: PressureSource,
-    state: PressureState,
-    ownContributionEstimate: Schema.optional(Schema.Number),
-  }).annotate({ identifier: "Emulation.setPressureDataOverride.params" }),
-  result: Schema.Struct({}).annotate({
-    identifier: "Emulation.setPressureDataOverride.result",
   }),
 } as const;
 
@@ -608,8 +606,7 @@ export const setPressureSourceOverrideEnabled = {
   }),
 } as const;
 
-/** @experimental TODO: OBSOLETE: To remove when setPressureDataOverride is merged.
-Provides a given pressure state that will be processed and eventually be
+/** @experimental Provides a given pressure state that will be processed and eventually be
 delivered to PressureObserver users. |source| must have been previously
 overridden by setPressureSourceOverrideEnabled. */
 export const setPressureStateOverride = {
@@ -705,7 +702,7 @@ value of the `svh` and `lvh` unit, respectively. Only supported for top-level fr
 export const setSmallViewportHeightDifferenceOverride = {
   method: "Emulation.setSmallViewportHeightDifferenceOverride" as const,
   params: Schema.Struct({
-    difference: Schema.Number,
+    difference: Schema.Int,
   }).annotate({
     identifier: "Emulation.setSmallViewportHeightDifferenceOverride.params",
   }),
@@ -728,7 +725,7 @@ export const setTouchEmulationEnabled = {
   method: "Emulation.setTouchEmulationEnabled" as const,
   params: Schema.Struct({
     enabled: Schema.Boolean,
-    maxTouchPoints: Schema.optional(Schema.Number),
+    maxTouchPoints: Schema.optional(Schema.Int),
   }).annotate({ identifier: "Emulation.setTouchEmulationEnabled.params" }),
   result: Schema.Struct({}).annotate({
     identifier: "Emulation.setTouchEmulationEnabled.result",
@@ -749,20 +746,38 @@ export const setUserAgentOverride = {
   }),
 } as const;
 
+/** @experimental Overrides virtual keyboard geometry in CSS pixels, relative to the top-level viewport. The
+provided rect is used for navigator.virtualKeyboard.boundingRect, geometrychange events, and
+env(keyboard-inset-*) values on the inspected frame. The override applies independently of
+navigator.virtualKeyboard.overlaysContent so clients can preview overlay geometry without
+mutating page state. Values are rounded to the nearest CSS pixel. Omitting the rect clears the
+override. */
+export const setVirtualKeyboardGeometryOverride = {
+  method: "Emulation.setVirtualKeyboardGeometryOverride" as const,
+  params: Schema.Struct({
+    keyboardRect: Schema.optional(Schema.suspend(() => DOM.Rect)),
+  }).annotate({
+    identifier: "Emulation.setVirtualKeyboardGeometryOverride.params",
+  }),
+  result: Schema.Struct({}).annotate({
+    identifier: "Emulation.setVirtualKeyboardGeometryOverride.result",
+  }),
+} as const;
+
 /** @experimental Turns on virtual time for all frames (replacing real-time with a synthetic time source) and sets
 the current virtual time policy.  Note this supersedes any previous time budget. */
 export const setVirtualTimePolicy = {
   method: "Emulation.setVirtualTimePolicy" as const,
   params: Schema.Struct({
     policy: VirtualTimePolicy,
-    budget: Schema.optional(Schema.Number),
-    maxVirtualTimeTaskStarvationCount: Schema.optional(Schema.Number),
+    budget: Schema.optional(Schema.Finite),
+    maxVirtualTimeTaskStarvationCount: Schema.optional(Schema.Int),
     initialVirtualTime: Schema.optional(
       Schema.suspend(() => Network.TimeSinceEpoch),
     ),
   }).annotate({ identifier: "Emulation.setVirtualTimePolicy.params" }),
   result: Schema.Struct({
-    virtualTimeTicksBase: Schema.Number,
+    virtualTimeTicksBase: Schema.Finite,
   }).annotate({ identifier: "Emulation.setVirtualTimePolicy.result" }),
 } as const;
 
@@ -772,8 +787,8 @@ on Android. */
 export const setVisibleSize = {
   method: "Emulation.setVisibleSize" as const,
   params: Schema.Struct({
-    width: Schema.Number,
-    height: Schema.Number,
+    width: Schema.Int,
+    height: Schema.Int,
   }).annotate({ identifier: "Emulation.setVisibleSize.params" }),
   result: Schema.Struct({}).annotate({
     identifier: "Emulation.setVisibleSize.result",
@@ -785,14 +800,14 @@ export const updateScreen = {
   method: "Emulation.updateScreen" as const,
   params: Schema.Struct({
     screenId: ScreenId,
-    left: Schema.optional(Schema.Number),
-    top: Schema.optional(Schema.Number),
-    width: Schema.optional(Schema.Number),
-    height: Schema.optional(Schema.Number),
+    left: Schema.optional(Schema.Int),
+    top: Schema.optional(Schema.Int),
+    width: Schema.optional(Schema.Int),
+    height: Schema.optional(Schema.Int),
     workAreaInsets: Schema.optional(WorkAreaInsets),
-    devicePixelRatio: Schema.optional(Schema.Number),
-    rotation: Schema.optional(Schema.Number),
-    colorDepth: Schema.optional(Schema.Number),
+    devicePixelRatio: Schema.optional(Schema.Finite),
+    rotation: Schema.optional(Schema.Int),
+    colorDepth: Schema.optional(Schema.Int),
     label: Schema.optional(Schema.String),
     isInternal: Schema.optional(Schema.Boolean),
   }).annotate({ identifier: "Emulation.updateScreen.params" }),

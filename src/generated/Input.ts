@@ -11,7 +11,7 @@ export const DragDataItem = Schema.Struct({
 export const DragData = Schema.Struct({
   items: Schema.Array(DragDataItem),
   files: Schema.optional(Schema.Array(Schema.String)),
-  dragOperationsMask: Schema.Number,
+  dragOperationsMask: Schema.Int,
 }).annotate({ identifier: "Input.DragData" });
 
 export const GestureSourceType = Schema.Literals([
@@ -29,22 +29,22 @@ export const MouseButton = Schema.Literals([
   "forward",
 ]).annotate({ identifier: "Input.MouseButton" });
 
-export const TimeSinceEpoch = Schema.Number.annotate({
+export const TimeSinceEpoch = Schema.Finite.annotate({
   identifier: "Input.TimeSinceEpoch",
 });
 
 export const TouchPoint = Schema.Struct({
-  x: Schema.Number,
-  y: Schema.Number,
-  radiusX: Schema.optional(Schema.Number),
-  radiusY: Schema.optional(Schema.Number),
-  rotationAngle: Schema.optional(Schema.Number),
-  force: Schema.optional(Schema.Number),
-  tangentialPressure: Schema.optional(Schema.Number),
-  tiltX: Schema.optional(Schema.Number),
-  tiltY: Schema.optional(Schema.Number),
-  twist: Schema.optional(Schema.Number),
-  id: Schema.optional(Schema.Number),
+  x: Schema.Finite,
+  y: Schema.Finite,
+  radiusX: Schema.optional(Schema.Finite),
+  radiusY: Schema.optional(Schema.Finite),
+  rotationAngle: Schema.optional(Schema.Finite),
+  force: Schema.optional(Schema.Finite),
+  tangentialPressure: Schema.optional(Schema.Finite),
+  tiltX: Schema.optional(Schema.Finite),
+  tiltY: Schema.optional(Schema.Finite),
+  twist: Schema.optional(Schema.Int),
+  id: Schema.optional(Schema.Finite),
 }).annotate({ identifier: "Input.TouchPoint" });
 
 export const cancelDragging = {
@@ -62,10 +62,10 @@ export const dispatchDragEvent = {
   method: "Input.dispatchDragEvent" as const,
   params: Schema.Struct({
     type: Schema.Literals(["dragEnter", "dragOver", "drop", "dragCancel"]),
-    x: Schema.Number,
-    y: Schema.Number,
+    x: Schema.Finite,
+    y: Schema.Finite,
     data: DragData,
-    modifiers: Schema.optional(Schema.Number),
+    modifiers: Schema.optional(Schema.Int),
   }).annotate({ identifier: "Input.dispatchDragEvent.params" }),
   result: Schema.Struct({}).annotate({
     identifier: "Input.dispatchDragEvent.result",
@@ -76,19 +76,19 @@ export const dispatchKeyEvent = {
   method: "Input.dispatchKeyEvent" as const,
   params: Schema.Struct({
     type: Schema.Literals(["keyDown", "keyUp", "rawKeyDown", "char"]),
-    modifiers: Schema.optional(Schema.Number),
+    modifiers: Schema.optional(Schema.Int),
     timestamp: Schema.optional(TimeSinceEpoch),
     text: Schema.optional(Schema.String),
     unmodifiedText: Schema.optional(Schema.String),
     keyIdentifier: Schema.optional(Schema.String),
     code: Schema.optional(Schema.String),
     key: Schema.optional(Schema.String),
-    windowsVirtualKeyCode: Schema.optional(Schema.Number),
-    nativeVirtualKeyCode: Schema.optional(Schema.Number),
+    windowsVirtualKeyCode: Schema.optional(Schema.Int),
+    nativeVirtualKeyCode: Schema.optional(Schema.Int),
     autoRepeat: Schema.optional(Schema.Boolean),
     isKeypad: Schema.optional(Schema.Boolean),
     isSystemKey: Schema.optional(Schema.Boolean),
-    location: Schema.optional(Schema.Number),
+    location: Schema.optional(Schema.Int),
     /** @experimental Editing commands to send with the key event (e.g., 'selectAll') (default: []).
     These are related to but not equal the command names used in `document.execCommand` and NSStandardKeyBindingResponding.
     See https://source.chromium.org/chromium/chromium/src/+/main:third_party/blink/renderer/core/editing/commands/editor_command_names.h for valid command names. */
@@ -108,23 +108,23 @@ export const dispatchMouseEvent = {
       "mouseMoved",
       "mouseWheel",
     ]),
-    x: Schema.Number,
-    y: Schema.Number,
-    modifiers: Schema.optional(Schema.Number),
+    x: Schema.Finite,
+    y: Schema.Finite,
+    modifiers: Schema.optional(Schema.Int),
     timestamp: Schema.optional(TimeSinceEpoch),
     button: Schema.optional(MouseButton),
-    buttons: Schema.optional(Schema.Number),
-    clickCount: Schema.optional(Schema.Number),
+    buttons: Schema.optional(Schema.Int),
+    clickCount: Schema.optional(Schema.Int),
     /** @experimental The normalized pressure, which has a range of [0,1] (default: 0). */
-    force: Schema.optional(Schema.Number),
+    force: Schema.optional(Schema.Finite),
     /** @experimental The normalized tangential pressure, which has a range of [-1,1] (default: 0). */
-    tangentialPressure: Schema.optional(Schema.Number),
-    tiltX: Schema.optional(Schema.Number),
-    tiltY: Schema.optional(Schema.Number),
+    tangentialPressure: Schema.optional(Schema.Finite),
+    tiltX: Schema.optional(Schema.Finite),
+    tiltY: Schema.optional(Schema.Finite),
     /** @experimental The clockwise rotation of a pen stylus around its own major axis, in degrees in the range [0,359] (default: 0). */
-    twist: Schema.optional(Schema.Number),
-    deltaX: Schema.optional(Schema.Number),
-    deltaY: Schema.optional(Schema.Number),
+    twist: Schema.optional(Schema.Int),
+    deltaX: Schema.optional(Schema.Finite),
+    deltaY: Schema.optional(Schema.Finite),
     pointerType: Schema.optional(Schema.Literals(["mouse", "pen"])),
   }).annotate({ identifier: "Input.dispatchMouseEvent.params" }),
   result: Schema.Struct({}).annotate({
@@ -142,7 +142,7 @@ export const dispatchTouchEvent = {
       "touchCancel",
     ]),
     touchPoints: Schema.Array(TouchPoint),
-    modifiers: Schema.optional(Schema.Number),
+    modifiers: Schema.optional(Schema.Int),
     timestamp: Schema.optional(TimeSinceEpoch),
   }).annotate({ identifier: "Input.dispatchTouchEvent.params" }),
   result: Schema.Struct({}).annotate({
@@ -160,14 +160,14 @@ export const emulateTouchFromMouseEvent = {
       "mouseMoved",
       "mouseWheel",
     ]),
-    x: Schema.Number,
-    y: Schema.Number,
+    x: Schema.Int,
+    y: Schema.Int,
     button: MouseButton,
     timestamp: Schema.optional(TimeSinceEpoch),
-    deltaX: Schema.optional(Schema.Number),
-    deltaY: Schema.optional(Schema.Number),
-    modifiers: Schema.optional(Schema.Number),
-    clickCount: Schema.optional(Schema.Number),
+    deltaX: Schema.optional(Schema.Finite),
+    deltaY: Schema.optional(Schema.Finite),
+    modifiers: Schema.optional(Schema.Int),
+    clickCount: Schema.optional(Schema.Int),
   }).annotate({ identifier: "Input.emulateTouchFromMouseEvent.params" }),
   result: Schema.Struct({}).annotate({
     identifier: "Input.emulateTouchFromMouseEvent.result",
@@ -181,10 +181,10 @@ export const imeSetComposition = {
   method: "Input.imeSetComposition" as const,
   params: Schema.Struct({
     text: Schema.String,
-    selectionStart: Schema.Number,
-    selectionEnd: Schema.Number,
-    replacementStart: Schema.optional(Schema.Number),
-    replacementEnd: Schema.optional(Schema.Number),
+    selectionStart: Schema.Int,
+    selectionEnd: Schema.Int,
+    replacementStart: Schema.optional(Schema.Int),
+    replacementEnd: Schema.optional(Schema.Int),
   }).annotate({ identifier: "Input.imeSetComposition.params" }),
   result: Schema.Struct({}).annotate({
     identifier: "Input.imeSetComposition.result",
@@ -227,10 +227,10 @@ export const setInterceptDrags = {
 export const synthesizePinchGesture = {
   method: "Input.synthesizePinchGesture" as const,
   params: Schema.Struct({
-    x: Schema.Number,
-    y: Schema.Number,
-    scaleFactor: Schema.Number,
-    relativeSpeed: Schema.optional(Schema.Number),
+    x: Schema.Finite,
+    y: Schema.Finite,
+    scaleFactor: Schema.Finite,
+    relativeSpeed: Schema.optional(Schema.Int),
     gestureSourceType: Schema.optional(GestureSourceType),
   }).annotate({ identifier: "Input.synthesizePinchGesture.params" }),
   result: Schema.Struct({}).annotate({
@@ -242,17 +242,17 @@ export const synthesizePinchGesture = {
 export const synthesizeScrollGesture = {
   method: "Input.synthesizeScrollGesture" as const,
   params: Schema.Struct({
-    x: Schema.Number,
-    y: Schema.Number,
-    xDistance: Schema.optional(Schema.Number),
-    yDistance: Schema.optional(Schema.Number),
-    xOverscroll: Schema.optional(Schema.Number),
-    yOverscroll: Schema.optional(Schema.Number),
+    x: Schema.Finite,
+    y: Schema.Finite,
+    xDistance: Schema.optional(Schema.Finite),
+    yDistance: Schema.optional(Schema.Finite),
+    xOverscroll: Schema.optional(Schema.Finite),
+    yOverscroll: Schema.optional(Schema.Finite),
     preventFling: Schema.optional(Schema.Boolean),
-    speed: Schema.optional(Schema.Number),
+    speed: Schema.optional(Schema.Int),
     gestureSourceType: Schema.optional(GestureSourceType),
-    repeatCount: Schema.optional(Schema.Number),
-    repeatDelayMs: Schema.optional(Schema.Number),
+    repeatCount: Schema.optional(Schema.Int),
+    repeatDelayMs: Schema.optional(Schema.Int),
     interactionMarkerName: Schema.optional(Schema.String),
   }).annotate({ identifier: "Input.synthesizeScrollGesture.params" }),
   result: Schema.Struct({}).annotate({
@@ -264,10 +264,10 @@ export const synthesizeScrollGesture = {
 export const synthesizeTapGesture = {
   method: "Input.synthesizeTapGesture" as const,
   params: Schema.Struct({
-    x: Schema.Number,
-    y: Schema.Number,
-    duration: Schema.optional(Schema.Number),
-    tapCount: Schema.optional(Schema.Number),
+    x: Schema.Finite,
+    y: Schema.Finite,
+    duration: Schema.optional(Schema.Int),
+    tapCount: Schema.optional(Schema.Int),
     gestureSourceType: Schema.optional(GestureSourceType),
   }).annotate({ identifier: "Input.synthesizeTapGesture.params" }),
   result: Schema.Struct({}).annotate({

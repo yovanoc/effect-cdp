@@ -1,6 +1,6 @@
 import { Schema } from "effect";
 
-const CdpRequestIdSchema = Schema.Number.pipe(
+const CdpRequestIdSchema = Schema.Int.pipe(
   Schema.brand("CdpRequestId"),
 ).annotate({
   identifier: "CdpRequestId",

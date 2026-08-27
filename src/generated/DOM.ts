@@ -4,17 +4,17 @@ import * as Network from "./Network.js";
 import * as Page from "./Page.js";
 import * as Runtime from "./Runtime.js";
 
-export const BackendNodeId = Schema.Number.annotate({
+export const BackendNodeId = Schema.Int.annotate({
   identifier: "DOM.BackendNodeId",
 });
 
 export const BackendNode = Schema.Struct({
-  nodeType: Schema.Number,
+  nodeType: Schema.Int,
   nodeName: Schema.String,
   backendNodeId: BackendNodeId,
 }).annotate({ identifier: "DOM.BackendNode" });
 
-export const Quad = Schema.Array(Schema.Number).annotate({
+export const Quad = Schema.Array(Schema.Finite).annotate({
   identifier: "DOM.Quad",
 });
 
@@ -29,8 +29,8 @@ export const BoxModel = Schema.Struct({
   padding: Quad,
   border: Quad,
   margin: Quad,
-  width: Schema.Number,
-  height: Schema.Number,
+  width: Schema.Int,
+  height: Schema.Int,
   shapeOutside: Schema.optional(ShapeOutsideInfo),
 }).annotate({ identifier: "DOM.BoxModel" });
 
@@ -103,11 +103,11 @@ export const Node: Schema.Schema<DOMNodeType> = Schema.suspend(() =>
     nodeId: NodeId,
     parentId: Schema.optional(NodeId),
     backendNodeId: BackendNodeId,
-    nodeType: Schema.Number,
+    nodeType: Schema.Int,
     nodeName: Schema.String,
     localName: Schema.String,
     nodeValue: Schema.String,
-    childNodeCount: Schema.optional(Schema.Number),
+    childNodeCount: Schema.optional(Schema.Int),
     children: Schema.optional(Schema.Array(Node)),
     attributes: Schema.optional(Schema.Array(Schema.String)),
     documentURL: Schema.optional(Schema.String),
@@ -138,7 +138,7 @@ export const Node: Schema.Schema<DOMNodeType> = Schema.suspend(() =>
   }),
 ).annotate({ identifier: "DOM.Node" });
 
-export const NodeId = Schema.Number.annotate({ identifier: "DOM.NodeId" });
+export const NodeId = Schema.Int.annotate({ identifier: "DOM.NodeId" });
 
 export const DetachedElementInfo = Schema.Struct({
   treeNode: Node,
@@ -197,22 +197,25 @@ export const PseudoType = Schema.Literals([
   "file-selector-button",
   "details-content",
   "picker",
+  "select-listbox",
   "permission-icon",
   "overscroll-area-parent",
+  "overscroll-backdrop",
+  "skeleton",
 ]).annotate({ identifier: "DOM.PseudoType" });
 
 export const Rect = Schema.Struct({
-  x: Schema.Number,
-  y: Schema.Number,
-  width: Schema.Number,
-  height: Schema.Number,
+  x: Schema.Finite,
+  y: Schema.Finite,
+  width: Schema.Finite,
+  height: Schema.Finite,
 }).annotate({ identifier: "DOM.Rect" });
 
 export const RGBA = Schema.Struct({
-  r: Schema.Number,
-  g: Schema.Number,
-  b: Schema.Number,
-  a: Schema.optional(Schema.Number),
+  r: Schema.Int,
+  g: Schema.Int,
+  b: Schema.Int,
+  a: Schema.optional(Schema.Finite),
 }).annotate({ identifier: "DOM.RGBA" });
 
 export const ScrollOrientation = Schema.Literals([
@@ -261,7 +264,7 @@ export const describeNode = {
     nodeId: Schema.optional(NodeId),
     backendNodeId: Schema.optional(BackendNodeId),
     objectId: Schema.optional(Runtime.RemoteObjectId),
-    depth: Schema.optional(Schema.Number),
+    depth: Schema.optional(Schema.Int),
     pierce: Schema.optional(Schema.Boolean),
   }).annotate({ identifier: "DOM.describeNode.params" }),
   result: Schema.Struct({
@@ -306,6 +309,19 @@ export const focus = {
   result: Schema.Struct({}).annotate({ identifier: "DOM.focus.result" }),
 } as const;
 
+/** @experimental When enabling, this API forces an element to gain interest in its target,
+keeping interest active until disabled. */
+export const forceShowInterest = {
+  method: "DOM.forceShowInterest" as const,
+  params: Schema.Struct({
+    nodeId: NodeId,
+    enable: Schema.Boolean,
+  }).annotate({ identifier: "DOM.forceShowInterest.params" }),
+  result: Schema.Struct({}).annotate({
+    identifier: "DOM.forceShowInterest.result",
+  }),
+} as const;
+
 /** @experimental When enabling, this API force-opens the popover identified by nodeId
 and keeps it open until disabled. */
 export const forceShowPopover = {
@@ -313,6 +329,7 @@ export const forceShowPopover = {
   params: Schema.Struct({
     nodeId: NodeId,
     enable: Schema.Boolean,
+    invokerNodeId: Schema.optional(BackendNodeId),
   }).annotate({ identifier: "DOM.forceShowPopover.params" }),
   result: Schema.Struct({
     nodeIds: Schema.Array(NodeId),
@@ -402,7 +419,7 @@ export const getDetachedDomNodes = {
 export const getDocument = {
   method: "DOM.getDocument" as const,
   params: Schema.Struct({
-    depth: Schema.optional(Schema.Number),
+    depth: Schema.optional(Schema.Int),
     pierce: Schema.optional(Schema.Boolean),
   }).annotate({ identifier: "DOM.getDocument.params" }),
   result: Schema.Struct({
@@ -444,7 +461,7 @@ Use DOMSnapshot.captureSnapshot instead. */
 export const getFlattenedDocument = {
   method: "DOM.getFlattenedDocument" as const,
   params: Schema.Struct({
-    depth: Schema.optional(Schema.Number),
+    depth: Schema.optional(Schema.Int),
     pierce: Schema.optional(Schema.Boolean),
   }).annotate({ identifier: "DOM.getFlattenedDocument.params" }),
   result: Schema.Struct({
@@ -467,8 +484,8 @@ export const getFrameOwner = {
 export const getNodeForLocation = {
   method: "DOM.getNodeForLocation" as const,
   params: Schema.Struct({
-    x: Schema.Number,
-    y: Schema.Number,
+    x: Schema.Int,
+    y: Schema.Int,
     includeUserAgentShadowDOM: Schema.optional(Schema.Boolean),
     ignorePointerEventsNone: Schema.optional(Schema.Boolean),
   }).annotate({ identifier: "DOM.getNodeForLocation.params" }),
@@ -546,8 +563,8 @@ export const getSearchResults = {
   method: "DOM.getSearchResults" as const,
   params: Schema.Struct({
     searchId: Schema.String,
-    fromIndex: Schema.Number,
-    toIndex: Schema.Number,
+    fromIndex: Schema.Int,
+    toIndex: Schema.Int,
   }).annotate({ identifier: "DOM.getSearchResults.params" }),
   result: Schema.Struct({
     nodeIds: Schema.Array(NodeId),
@@ -630,7 +647,7 @@ export const performSearch = {
   }).annotate({ identifier: "DOM.performSearch.params" }),
   result: Schema.Struct({
     searchId: Schema.String,
-    resultCount: Schema.Number,
+    resultCount: Schema.Int,
   }).annotate({ identifier: "DOM.performSearch.result" }),
 } as const;
 
@@ -708,7 +725,7 @@ export const requestChildNodes = {
   method: "DOM.requestChildNodes" as const,
   params: Schema.Struct({
     nodeId: NodeId,
-    depth: Schema.optional(Schema.Number),
+    depth: Schema.optional(Schema.Int),
     pierce: Schema.optional(Schema.Boolean),
   }).annotate({ identifier: "DOM.requestChildNodes.params" }),
   result: Schema.Struct({}).annotate({
@@ -905,7 +922,7 @@ export const childNodeCountUpdated = {
   method: "DOM.childNodeCountUpdated" as const,
   params: Schema.Struct({
     nodeId: NodeId,
-    childNodeCount: Schema.Number,
+    childNodeCount: Schema.Int,
   }).annotate({ identifier: "DOM.childNodeCountUpdated.params" }),
 } as const;
 
