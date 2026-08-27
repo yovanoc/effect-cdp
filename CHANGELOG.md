@@ -1,5 +1,11 @@
 # effect-cdp
 
+## 0.2.0
+
+### Minor Changes
+
+- [`595476e`](https://github.com/yovanoc/effect-cdp/commit/595476e2f358c371dd2d44691f6a4006abfa17ad) Thanks [@yovanoc](https://github.com/yovanoc)! - Upgrade to Effect 4.0.0-rc.112 and the latest CDP protocol definitions, including the new Ads and DigitalCredentials domains.
+
 ## 0.1.6
 
 ### Patch Changes
